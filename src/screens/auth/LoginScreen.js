@@ -1,15 +1,16 @@
-import { Text, TextInput, View, KeyboardAvoidingView, NativeModules} from 'react-native'
+import { Text, TextInput, View, KeyboardAvoidingView, NativeModules } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import * as yup from 'yup'
-import { Dimensions } from 'react-native'
 import { Formik } from 'formik'
+import { Dimensions } from 'react-native'
 import { makeStyles } from '@rneui/themed';
 import { Button } from 'react-native-paper';
 import { CheckBox } from '@rneui/themed';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import {ROUTES} from '../../constants/routes'
 const LoginScreen = (props) => {
-
+    const { navigation } = props;
     const windowWidth = Dimensions.get('window').width;
     const windowHeight = Dimensions.get('window').height;
     const styles = useStyles(props, windowWidth, windowHeight);
@@ -25,11 +26,11 @@ const LoginScreen = (props) => {
             setStatusBarHeight(statusBarFrameData.height)
         }) : null
     }, []);
-    
+
     function toggleShown() {
         setShown(!shown)
     }
-
+    
 
     const [statusBarHeight, setStatusBarHeight] = useState(0);
 
@@ -61,8 +62,8 @@ const LoginScreen = (props) => {
                                         value={values.email}
                                     />
                                 </View>
-                                <View style={{marginTop: 10}}>
-                                    <Text style={{ color: 'red' }}>{values.email.length > 0 ? errors.email: ''}</Text>
+                                <View style={{ marginTop: 10 }}>
+                                    <Text style={{ color: 'red' }}>{values.email.length > 0 ? errors.email : ''}</Text>
                                 </View>
                             </>
                             <>
@@ -84,7 +85,7 @@ const LoginScreen = (props) => {
                                         <Ionicons onPress={() => toggleShown()} name={shown ? 'eye' : 'eye-off'} size={28} color={isPwFocused ? 'red' : 'black'} />
                                     </TouchableOpacity>
                                 </View>
-                                <View style={{marginTop: 10}}>
+                                <View style={{ marginTop: 10 }}>
                                     <Text style={{ color: 'red' }}>{values.password.length > 0 ? errors.password : ''}</Text>
                                 </View>
                             </>
@@ -94,13 +95,13 @@ const LoginScreen = (props) => {
                             behavior={"padding"}
                             keyboardVerticalOffset={statusBarHeight + 100}
                         >
-                            <View style={{flexDirection: 'row', alignItems: 'center',  justifyContent: 'space-between', paddingRight: 5}}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingRight: 5 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <CheckBox
                                         color="white"
                                         center
-                                        containerStyle ={{backgroundColor: 'transparent'}}
-                                        textStyle={checked ? {color: 'black', fontWeight: 'bold'} : {}}
+                                        containerStyle={{ backgroundColor: 'transparent' }}
+                                        textStyle={checked ? { color: 'black', fontWeight: 'bold' } : {}}
                                         title="로그인 정보 저장"
                                         checked={checked}
                                         checkedColor="red"
@@ -109,21 +110,23 @@ const LoginScreen = (props) => {
                                         onPress={() => {
                                             setChecked(!checked)
                                         }}
-                                        />
+                                    />
                                 </View>
                                 <View>
-                                    <Text style={{fontSize: 13}}>비밀번호를 잊으셨나요?</Text>
+                                    <TouchableOpacity onPress={() => navigation.push(ROUTES.REGISTEREMAILAUTH, {type: 'findPassword'})}>
+                                        <Text style={{ fontSize: 13 }}>비밀번호를 잊으셨나요?</Text>
+                                    </TouchableOpacity>
                                 </View>
                             </View>
                             <View>
-                            <Button mode="contained" style={isValid ? styles.activeLoginButton : styles.inActiveLoginButton} onPress={() => handleSubmit()} disabled={!isValid}>
-                                <Text style={{color: 'white'}}>
-                                    로그인
-                                </Text>
-                            </Button>
+                                <Button mode="contained" style={isValid ? styles.activeLoginButton : styles.inActiveLoginButton} onPress={() => handleSubmit()} disabled={!isValid}>
+                                    <Text style={{ color: 'white' }}>
+                                        로그인
+                                    </Text>
+                                </Button>
                             </View>
-                            <View style={{flexDirection:'row', justifyContent: 'center', marginTop: 15}}>
-                                <Text style={{marginRight: 10}}>회원이 아니신가요?</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
+                                <Text style={{ marginRight: 10 }}>회원이 아니신가요?</Text>
                                 <Text style={styles.joinText}>회원가입</Text>
                             </View>
                         </KeyboardAvoidingView>
@@ -135,7 +138,9 @@ const LoginScreen = (props) => {
 
 const loginValidationSchema = yup.object().shape({
     email: yup.string().required("이메일을 입력해주세요").email("올바른 이메일을 작성해주세요"),
-    password: yup.string().min(8, ({ min }) => "비밀번호는 최소 " + min + " 자리 이상입니다.").required("비밀번호를 입력해주세요")
+    password: yup.string().required("비밀번호를 입력해주세요")
+    .min(8, ({ min }) => "비밀번호는 최소 " + min + " 자리 이상입니다.")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/, '영문 대소문자,숫자 특수문자 포함 8-20자이내')
 })
 
 export default LoginScreen
@@ -146,9 +151,11 @@ const useStyles = makeStyles((theme, props) => ({
         justifyContent: 'flex-start',
         alignSelf: 'center',
         alignItems: "center",
-        width: '90%',
+        width: '100%',
+        paddingHorizontal: 20,
         height: props.windowHeight,
         position: 'relative',
+        backgroundColor: theme.colors.white
     },
     box: {
         marginTop: 20,
@@ -173,7 +180,7 @@ const useStyles = makeStyles((theme, props) => ({
     },
     inActivePwInput: {
         flexDirection: 'row',
-        marginTop: 30,
+        marginTop: 20,
         paddingHorizontal: 10,
         color: theme.colors.black,
         borderBottomColor: theme.colors.grey4,
@@ -183,7 +190,7 @@ const useStyles = makeStyles((theme, props) => ({
     },
     activePwInput: {
         flexDirection: 'row',
-        marginTop: 30,
+        marginTop: 20,
         paddingHorizontal: 10,
         color: theme.colors.black,
         borderBottomColor: theme.colors.error,
@@ -198,12 +205,12 @@ const useStyles = makeStyles((theme, props) => ({
 
     },
     activeLoginButton: {
-        marginTop: 10, 
+        marginTop: 10,
         backgroundColor: theme.colors.grey4,
         borderRadius: 10,
     },
-     inActiveLoginButton: {
-        marginTop: 10, 
+    inActiveLoginButton: {
+        marginTop: 10,
         backgroundColor: theme.colors.grey1,
         borderRadius: 10,
     },
