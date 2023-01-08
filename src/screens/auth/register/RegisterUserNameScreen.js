@@ -5,9 +5,6 @@ import { Formik } from 'formik'
 import { Dimensions } from 'react-native'
 import { makeStyles } from '@rneui/themed';
 import { Button } from 'react-native-paper';
-import { CheckBox } from '@rneui/themed';
-import Ionicons from "react-native-vector-icons/Ionicons";
-import { TouchableOpacity } from 'react-native-gesture-handler'
 import { ROUTES } from '../../../constants/routes'
 const RegisterUserNameScreen = (props) => {
     const { navigation } = props;
@@ -33,7 +30,7 @@ const RegisterUserNameScreen = (props) => {
             initialValues={{ userName: ''}}
             validateOnMount={true}
             onSubmit={values => {
-                navigation.navigate()
+                navigation.navigate(ROUTES.REGISTERPROFILEIMAGE)
             }}
             validationSchema={loginValidationSchema}
         >
@@ -169,7 +166,7 @@ const useStyles = makeStyles((theme, props) => ({
     },
     activeButton: {
         marginTop: 10, 
-        backgroundColor: theme.colors.grey1,
+        backgroundColor: theme.colors.grey4,
         width: '100%',
         borderRadius: 10,
         height: 50,
@@ -178,7 +175,7 @@ const useStyles = makeStyles((theme, props) => ({
      inActiveButton: {
         marginTop: 10, 
         width: '100%',
-        backgroundColor: theme.colors.grey4,
+        backgroundColor: theme.colors.grey1,
         borderRadius: 10,
         height: 50,
         justifyContent: 'center'

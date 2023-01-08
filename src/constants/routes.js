@@ -11,6 +11,7 @@ const REGISTEREMAILAUTHVALIDATION = 'registerEmailAuthValidation'
 const REGISTERPASSWORD = 'registerPassword'
 const REGISTERUSERNAME = 'registerUserName'
 const REGISTERNICKNAME = 'registerNickName'
+const REGISTERPROFILEIMAGE = 'registerProfileImage'
 
 const FORGOTPASSWORD = 'forgotPassword'
 
@@ -39,7 +40,8 @@ export const ROUTES = {
     REGISTERPASSWORD,
     REGISTERUSERNAME,
     REGISTERNICKNAME,
-
+    REGISTERPROFILEIMAGE,
+    
     FORGOTPASSWORD,
 
     HOME,

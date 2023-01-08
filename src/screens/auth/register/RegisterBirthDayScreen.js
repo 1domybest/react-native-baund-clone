@@ -112,7 +112,7 @@ const useStyles = makeStyles((theme, props) => ({
   },
   activeLoginButton: {
     marginTop: 10, 
-    backgroundColor: theme.colors.grey1,
+    backgroundColor: theme.colors.grey4,
     width: '100%',
     borderRadius: 10,
     height: 50,
@@ -121,7 +121,7 @@ const useStyles = makeStyles((theme, props) => ({
  inActiveLoginButton: {
     marginTop: 10, 
     width: '100%',
-    backgroundColor: theme.colors.grey4,
+    backgroundColor: theme.colors.grey1,
     borderRadius: 10,
     height: 50,
     justifyContent: 'center'

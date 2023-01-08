@@ -8,6 +8,7 @@ import RegisterEmailAuthValidationScreen from '../screens/auth/register/Register
 import RegisterPasswordScreen from '../screens/auth/register/RegisterPasswordScreen'
 import RegisterUserNameScreen from '../screens/auth/register/RegisterNickNameScreen'
 import RegisterNickNameScreen from '../screens/auth/register/RegisterUserNameScreen'
+import RegisterProfileImage from '../screens/auth/register/RegisterProfileImage'
 const Stack = createNativeStackNavigator();
 
 const config = {
@@ -43,7 +44,7 @@ const AuthNavigation = () => {
                  <Stack.Screen name={ROUTES.REGISTERPASSWORD} component={RegisterPasswordScreen}  options={{headerShown: true, headerTitle: '',}} />
                  <Stack.Screen name={ROUTES.REGISTERNICKNAME} component={RegisterNickNameScreen}  options={{headerShown: true, headerTitle: '',}} />
                  <Stack.Screen name={ROUTES.REGISTERUSERNAME} component={RegisterUserNameScreen}  options={{headerShown: true, headerTitle: '',}} />
-                 
+                 <Stack.Screen name={ROUTES.REGISTERPROFILEIMAGE} component={RegisterProfileImage}  options={{headerShown: true, headerTitle: '',}} />
                  <Stack.Screen name={ROUTES.TEST} component={TestScreen}  options={{headerShown: true, headerTitle: '',}} />
     </Stack.Navigator>
   )
