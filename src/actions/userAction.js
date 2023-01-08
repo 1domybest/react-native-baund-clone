@@ -3,9 +3,10 @@ import axios from 'axios'
 import {Alert} from 'react-native'
 import * as $Util from '../constants/utils'
 import {ROUTES} from '../constants/routes'
-const sendEmailAuthCode = async () => {
+const sendEmailAuthCode = async (email) => {
+    console.log(email)
     return new Promise(function (resolve, reject) {
-        axios.post('http://192.168.219.141:8080/api/common/user/sendEmailAuthCode', {to: 'dhstjrxo123@gmail.com'}, {withCredentials: true})
+        axios.post('http://localhost:8080/api/common/user/sendEmailAuthCode', {to: email}, {withCredentials: true})
         .then(async function(res) {
             resolve(res.data);
         }).catch ((error) => {
@@ -15,9 +16,9 @@ const sendEmailAuthCode = async () => {
     })
 }
 
-const temporaryPassword = async () => {
+const temporaryPassword = async (email) => {
     return new Promise(function (resolve, reject) {
-        axios.post('http://192.168.219.141:8080/api/common/user/temporaryPassword', {to: 'dhstjrxo123@gmail.com'}, {withCredentials: true})
+        axios.post('http://192.168.219.141:8080/api/common/user/temporaryPassword', {to: email}, {withCredentials: true})
         .then(async function(res) {
             resolve(res.data.data.emailAuthCode);
         }).catch ((error) => {
@@ -114,7 +115,7 @@ const snsLoginRequset = createAsyncThunk('userLogIn', async (data, {dispatch, ge
 })
 
 const temporaryPasswordRequest = createAsyncThunk('userLogIn', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
-    temporaryPassword().then(function(res) {
+    temporaryPassword(data.email).then(function(res) {
     
         if (res.code === 200) {
             Alert.alert(
@@ -130,7 +131,7 @@ const temporaryPasswordRequest = createAsyncThunk('userLogIn', async (data, {dis
 
 
 const sendEmailAuthCodeRequest = createAsyncThunk('userLogIn', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
-    sendEmailAuthCode().then(function(res) {
+    sendEmailAuthCode(data.email).then(function(res) {
         console.log(res)
         if (res.code === 200) {
             Alert.alert(

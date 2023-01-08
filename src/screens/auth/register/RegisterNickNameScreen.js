@@ -33,7 +33,7 @@ const RegisterNickNameScreen = (props) => {
             initialValues={{ nickName: ''}}
             validateOnMount={true}
             onSubmit={values => {
-                navigation.navigate(ROUTES.REGISTERUSERNAME)
+                navigation.navigate(ROUTES.REGISTERUSERNAME, {email: props.route.params.email, password: props.route.params.password, nickName: values.nickName})
             }}
             validationSchema={loginValidationSchema}
         >
@@ -97,7 +97,7 @@ const RegisterNickNameScreen = (props) => {
 
 const loginValidationSchema = yup.object().shape({
     nickName: yup.string().required("사용자이름을 입력해주세요")
-        .matches(/^[_A-Za-z0-9+]{4,20}$/, '사용자이름 형식이 맞지 않습니다. 4-20자 (영문 소문자, 숫자, 밑줄 및 마침표만 포함 가능)')
+        .matches(/^[_a-z0-9+]{4,20}$/, '사용자이름 형식이 맞지 않습니다. 4-20자 (영문 소문자, 숫자, 밑줄 및 마침표만 포함 가능)')
 })
 
 export default RegisterNickNameScreen

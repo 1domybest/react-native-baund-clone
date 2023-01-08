@@ -6,8 +6,8 @@ import RegisterBirthDayScreen from '../screens/auth/register/RegisterBirthDayScr
 import TestScreen from '../screens/auth/TestScreen'
 import RegisterEmailAuthValidationScreen from '../screens/auth/register/RegisterEmailAuthValidationScreen'
 import RegisterPasswordScreen from '../screens/auth/register/RegisterPasswordScreen'
-import RegisterUserNameScreen from '../screens/auth/register/RegisterNickNameScreen'
-import RegisterNickNameScreen from '../screens/auth/register/RegisterUserNameScreen'
+import RegisterUserNameScreen from '../screens/auth/register/RegisterUserNameScreen'
+import RegisterNickNameScreen from '../screens/auth/register/RegisterNickNameScreen'
 import RegisterProfileImage from '../screens/auth/register/RegisterProfileImage'
 const Stack = createNativeStackNavigator();
 
@@ -33,7 +33,7 @@ const screenOption = {
     },
 }
 
-let initialRouteName = ROUTES.REGISTERPROFILEIMAGE
+let initialRouteName = ROUTES.REGISTERBIRTHDAY
 
 const AuthNavigation = () => {
   return (

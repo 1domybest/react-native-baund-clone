@@ -44,7 +44,7 @@ const RegisterPasswordScreen = (props) => {
             initialValues={{ password: '', rePassword: '' }}
             validateOnMount={true}
             onSubmit={values => {
-                navigation.navigate(ROUTES.REGISTERNICKNAME)
+                navigation.navigate(ROUTES.REGISTERNICKNAME, {email: props.route.params.email, password: values.password})
             }}
             validationSchema={loginValidationSchema}
         >

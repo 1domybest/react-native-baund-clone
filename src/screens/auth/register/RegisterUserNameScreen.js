@@ -30,7 +30,7 @@ const RegisterUserNameScreen = (props) => {
             initialValues={{ userName: ''}}
             validateOnMount={true}
             onSubmit={values => {
-                navigation.navigate(ROUTES.REGISTERPROFILEIMAGE)
+                navigation.navigate(ROUTES.REGISTERPROFILEIMAGE, {email: props.route.params.email,nickName : props.route.params.nickName, userName: values.userName, password: props.route.params.password})
             }}
             validationSchema={loginValidationSchema}
         >

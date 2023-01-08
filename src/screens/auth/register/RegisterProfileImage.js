@@ -65,8 +65,8 @@ const RegisterProfileImage = (props) => {
                         </TouchableOpacity>
                     </View>
                     <View style={{ marginLeft: 15 }}>
-                        <Text style={{ color: 'white', fontSize: 30 }}>user_name</Text>
-                        <Text style={{ color: 'white', fontSize: 18 }}>user_nickName</Text>
+                        <Text style={{ color: 'white', fontSize: 30 }}>{props.route.params.userName}</Text>
+                        <Text style={{ color: 'white', fontSize: 18 }}>{props.route.params.nickName}</Text>
                     </View>
                 </View>
             </View>
