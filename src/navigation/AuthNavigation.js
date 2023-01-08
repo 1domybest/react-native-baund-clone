@@ -57,7 +57,7 @@ const AuthNavigation = () => {
         <NavigationContainer>
             <Stack.Navigator initialRouteName={initialRouteName} screenOptions={screenOption}>
                  <Stack.Screen name={ROUTES.INDEX} component={IndexScreen} options={{headerShown: false}}/>
-                 <Stack.Screen name={ROUTES.REGISTEREMAILAUTH} component={RegisterEmailAuthScreen}  options={{headerShown: false, headerTitle: '',}} />
+                 <Stack.Screen name={ROUTES.REGISTEREMAILAUTH} component={RegisterEmailAuthScreen}  options={{headerShown: true, headerTitle: '',}} />
                  <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} options={{headerShown: true, headerTitle: '이메일로 로그인', headerTitleAlign: 'left', }} />
                  <Stack.Screen name={ROUTES.REGISTER} component={RegisterNavigation} options={{headerShown: false}} />
             </Stack.Navigator>
