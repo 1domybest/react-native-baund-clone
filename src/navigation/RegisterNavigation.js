@@ -33,7 +33,7 @@ const screenOption = {
     },
 }
 
-let initialRouteName = ROUTES.REGISTERBIRTHDAY
+let initialRouteName = ROUTES.REGISTERPROFILEIMAGE
 
 const AuthNavigation = () => {
   return (

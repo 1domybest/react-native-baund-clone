@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { Dimensions } from 'react-native'
 import { makeStyles } from '@rneui/themed';
 import { ROUTES } from '../../../constants/routes'
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Button } from 'react-native-paper';
-import { Avatar } from 'react-native-paper';
+import { Button, Avatar } from 'react-native-paper';
 import { CheckBox } from '@rneui/themed';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 const RegisterProfileImage = (props) => {
     const { navigation } = props;
     const toggleCheckbox = () => setChecked(!checked);
@@ -14,25 +14,54 @@ const RegisterProfileImage = (props) => {
     const windowHeight = Dimensions.get('window').height;
     const styles = useStyles(props, windowWidth, windowHeight);
     const [checked, setChecked] = React.useState(true);
+
+    const [profileImage, setProfileImage] = useState(null);
+
+    const [backgroundImage, setBackgroundImage] = useState(null);
+    
+
+    const beforeUploadBackgroundImage = () => {
+        launchImageLibrary({}, function (res) {
+            setBackgroundImage(res.assets[0])
+        })
+    }
+
+    const beforeUploadProfileImage = () => {
+        launchImageLibrary({}, function (res) {
+            setProfileImage(res.assets[0])
+        })
+    }
+
+
     return (
         <View style={styles.container}>
             <View style={{ marginBottom: 5 }}>
                 <Text style={styles.title}>프로필 이미지를 등록하세요.</Text>
             </View>
             <View style={{ backgroundColor: '#363535', position: 'relative' }}>
-                <TouchableOpacity>
-                    <Image source={require('../../../assets/baundProfileImage.png')} style={{ height: windowHeight / 2.2, width: windowWidth }} />
-                </TouchableOpacity>
-                <View style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row' }}>
-                    <TouchableOpacity>
+                <TouchableOpacity onPress={() => beforeUploadBackgroundImage()}>
+                    {
+                        backgroundImage === null ?
+                        <Image source={require('../../../assets/baundProfileImage.png')} style={{ height: windowHeight / 2.2, width: windowWidth }} />
+                        :
+                        <Image source={{uri: backgroundImage.uri}} style={{ height: windowHeight / 2.2, width: windowWidth }} />
+                    }
+                    <View style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row' }}>
                         <Avatar.Icon size={35} icon="camera" color='white' style={{ backgroundColor: 'grey' }} />
-                    </TouchableOpacity>
-                </View>
+                    </View> 
+                </TouchableOpacity>
                 <View style={{ position: 'absolute', bottom: 10, left: 10, flexDirection: 'row' }}>
                     <View style={{ position: 'relative' }}>
-                        <TouchableOpacity>
+                        <TouchableOpacity  onPress={() => beforeUploadProfileImage()}>
+                            {
+                            profileImage === null ? 
+                            <>
                             <Avatar.Icon size={65} icon="account" color='white' style={{ backgroundColor: 'lightgrey' }} />
                             <Avatar.Icon size={30} icon="camera" color='white' style={{ backgroundColor: '#363535', position: 'absolute', top: -5, right: -5 }} />
+                            </>
+                            :
+                            <Avatar.Image size={65} source={{uri: profileImage.uri}} />
+                            }
                         </TouchableOpacity>
                     </View>
                     <View style={{ marginLeft: 15 }}>
@@ -118,7 +147,7 @@ const RegisterProfileImage = (props) => {
                     }}
                 />
             </View>
-            <View style={{width: '100%'}}>
+            <View style={{ width: '100%' }}>
                 <Button mode="contained" style={true ? styles.activeButton : styles.inActiveButton} disabled={false}>
                     <Text style={{ color: 'white' }}>
                         다음
@@ -153,15 +182,15 @@ const useStyles = makeStyles((theme, props) => ({
         height: props.windowHeight / 2.2,
     },
     activeButton: {
-        marginTop: 10, 
+        marginTop: 10,
         backgroundColor: theme.colors.grey1,
         width: '100%',
         borderRadius: 10,
         height: 50,
         justifyContent: 'center'
     },
-     inActiveButton: {
-        marginTop: 10, 
+    inActiveButton: {
+        marginTop: 10,
         width: '100%',
         backgroundColor: theme.colors.grey4,
         borderRadius: 10,
