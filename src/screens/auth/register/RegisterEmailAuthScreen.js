@@ -20,6 +20,8 @@ const RegisterEmailAuthScreen = (props) => {
     }) : null
 }, []);
 
+console.log(props.route.params)
+
 const sendEmail = (email) => {
   if (props.route.params.type === 'findPassword') {
     dispatch(temporaryPasswordRequest({navigation: navigation, email: email}));

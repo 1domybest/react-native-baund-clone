@@ -28,6 +28,8 @@ const RegisterPasswordScreen = (props) => {
         }) : null
     }, []);
 
+    console.log(props.route.params)
+
     function toggleShown(type) {
         if (type === 'password') {
             setPasswordShown(!passwordShown)
@@ -35,7 +37,6 @@ const RegisterPasswordScreen = (props) => {
             setRePasswordShown(!rePasswordShown)
         }
     }
-
 
     const [statusBarHeight, setStatusBarHeight] = useState(0);
 

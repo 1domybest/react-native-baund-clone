@@ -13,11 +13,14 @@ const EmailAuthValidationScreen = (props) => {
   const [isBirthFocused, setIsBirthFocused] = useState(false);
   const { StatusBarManager } = NativeModules
   const dispatch = useDispatch();
+
   useEffect(() => {
     Platform.OS == 'ios' ? StatusBarManager.getHeight((statusBarFrameData) => {
         setStatusBarHeight(statusBarFrameData.height)
     }) : null
 }, []);
+
+console.log(props.route.params)
 
 const [statusBarHeight, setStatusBarHeight] = useState(0);
   return (
@@ -32,7 +35,8 @@ const [statusBarHeight, setStatusBarHeight] = useState(0);
               onPress: () => console.log('확인')
             }
           ])
-          navigation.replace(ROUTES.REGISTERPASSWORD, {email: props.route.params.email})
+          navigation.popToTop();
+          navigation.navigate(ROUTES.REGISTERPASSWORD, {email: props.route.params.email})
         } else {
           Alert.alert('인증번호가 일치하지 않습니다.',[
             {

@@ -7,17 +7,37 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Button, Avatar } from 'react-native-paper';
 import { CheckBox } from '@rneui/themed';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import AWSS3 from '../../../constants/awsS3'
+import fs from 'react-native-fs'
+import {base64, decode} from 'base64-arraybuffer'
+import { useDispatch, useSelector } from 'react-redux';
+import {registerRequest} from '../../../actions/userAction'
 const RegisterProfileImage = (props) => {
     const { navigation } = props;
+    const dispatch = useDispatch();
     const toggleCheckbox = () => setChecked(!checked);
     const windowWidth = Dimensions.get('window').width;
     const windowHeight = Dimensions.get('window').height;
     const styles = useStyles(props, windowWidth, windowHeight);
     const [checked, setChecked] = React.useState(true);
-
     const [profileImage, setProfileImage] = useState(null);
-
     const [backgroundImage, setBackgroundImage] = useState(null);
+
+
+    
+    console.log(props.route.params)
+
+    const fileUpload = async (rawFile, type) => {
+        const base64 = await fs.readFile(rawFile.uri, 'base64');
+        const arrayBuffer = decode(base64);
+        let file = {
+            uri: arrayBuffer,
+            type: rawFile.type,
+            name: rawFile.fileName
+        }
+        let result = await AWSS3.uploadFile(file, type);
+        return result;
+    }
     
 
     const beforeUploadBackgroundImage = () => {
@@ -30,6 +50,43 @@ const RegisterProfileImage = (props) => {
         launchImageLibrary({}, function (res) {
             setProfileImage(res.assets[0])
         })
+    }
+
+    const register = async () => {
+        let profileImageFile = null;
+        let backgrooundImageFile = null;
+        if (profileImage != null) {
+            await fileUpload(profileImage, 'profileImage').then(function(res) {
+                profileImageFile = {
+                    tag: res.ETag,
+                    bucket: res.Bucket,
+                    key: res.Key,
+                    location: res.Location,
+                    serverSideEncryption : res.ServerSideEncryption
+                }
+            })
+        }
+        if (backgroundImage != null) {
+            await fileUpload(backgroundImage, 'backgroundImage').then(function (res) {
+              backgrooundImageFile = {
+                tag: res.ETag,
+                bucket: res.Bucket,
+                key: res.Key,
+                location: res.Location,
+                serverSideEncryption : res.ServerSideEncryption
+            }
+            })
+        }
+
+        let data = {
+            userName: props.route.params.userName,
+            nickName: props.route.params.nickName,
+            password: props.route.params.password,
+            email: props.route.params.email,
+            profileImageFile: profileImageFile,
+            backgroundImageFile: backgrooundImageFile,
+        }
+        dispatch(registerRequest(data));
     }
 
 
@@ -148,7 +205,7 @@ const RegisterProfileImage = (props) => {
                 />
             </View>
             <View style={{ width: '100%' }}>
-                <Button mode="contained" style={true ? styles.activeButton : styles.inActiveButton} disabled={false}>
+                <Button mode="contained" style={true ? styles.activeButton : styles.inActiveButton} disabled={false} onPress={() => register()}>
                     <Text style={{ color: 'white' }}>
                         다음
                     </Text>
@@ -183,7 +240,7 @@ const useStyles = makeStyles((theme, props) => ({
     },
     activeButton: {
         marginTop: 10,
-        backgroundColor: theme.colors.grey1,
+        backgroundColor: theme.colors.grey4,
         width: '100%',
         borderRadius: 10,
         height: 50,
@@ -192,7 +249,7 @@ const useStyles = makeStyles((theme, props) => ({
     inActiveButton: {
         marginTop: 10,
         width: '100%',
-        backgroundColor: theme.colors.grey4,
+        backgroundColor: theme.colors.grey1,
         borderRadius: 10,
         height: 50,
         justifyContent: 'center'
