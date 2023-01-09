@@ -10,7 +10,8 @@ const register = async (data) => {
     return new Promise(function (resolve, reject) {
         axios.post('http://localhost:8080/api/common/user/register', data, {withCredentials: true})
         .then(async function(res) {
-            resolve(res.data);
+            console.log(res)
+            resolve(res);
         }).catch ((error) => {
             alert(error.response.data.message);
             reject (error.response.data) ;
