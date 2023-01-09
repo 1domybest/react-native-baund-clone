@@ -3,8 +3,10 @@
 import { combineReducers } from "redux";
 // 이름도 알기쉽게 바꿔준다.  userReducer => userSlice
 import themeSlicer from '../slicers/themeSlicer'
+import userSlicer from '../slicers/userSlicer'
 const rootSlicer = combineReducers({
-    themeSlicer: themeSlicer.reducer
+    themeSlicer: themeSlicer.reducer,
+    userSlicer: userSlicer.reducer
 });
 
 export default rootSlicer;

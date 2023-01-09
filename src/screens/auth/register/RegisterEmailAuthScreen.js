@@ -6,21 +6,20 @@ import * as yup from 'yup'
 import { Formik } from 'formik'
 import { Button } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import {sendEmailAuthCodeRequest, temporaryPasswordRequest} from '../../../actions/userAction'
+import {sendEmailAuthCodeRequest, temporaryPasswordRequest, emailDoubleCheckRequest} from '../../../actions/userAction'
+import userSlicer from '../../../slicers/userSlicer'
 const RegisterEmailAuthScreen = (props) => {
   const { navigation } = props;
   const styles = useStyles(props);
   const [isBirthFocused, setIsBirthFocused] = useState(false);
   const { StatusBarManager } = NativeModules
   const dispatch = useDispatch();
-
+  const isExistEmail = useSelector(state => state.userSlicer.isExistEmail)
   useEffect(() => {
     Platform.OS == 'ios' ? StatusBarManager.getHeight((statusBarFrameData) => {
         setStatusBarHeight(statusBarFrameData.height)
     }) : null
 }, []);
-
-console.log(props.route.params)
 
 const sendEmail = (email) => {
   if (props.route.params.type === 'findPassword') {
@@ -36,8 +35,11 @@ const [statusBarHeight, setStatusBarHeight] = useState(0);
     <Formik
       initialValues={{ email: '' }}
       validateOnMount={true}
-      onSubmit={values => {
-        sendEmail(values.email);
+      onSubmit={async values => {
+        dispatch(emailDoubleCheckRequest({email: values.email}));
+        if (isExistEmail) {
+          sendEmail(values.email); 
+        }
       }}
       validationSchema={emailValidationSchema}
     >

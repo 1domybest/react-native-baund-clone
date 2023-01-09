@@ -4,6 +4,19 @@ import {Alert} from 'react-native'
 import * as $Util from '../constants/utils'
 import {ROUTES} from '../constants/routes'
 
+
+const emailDoubleCheck = (data) => {
+     return new Promise(function (resolve, reject) {
+        axios.post('http://localhost:8080/api/common/user/userEmailDoubleCheck', data, {withCredentials: true})
+        .then(async function(res) {
+            resolve(res);
+        }).catch ((error) => {
+            alert(error.response.data.message);
+            reject (error.response.data) ;
+        })
+     })
+}
+
 const register = async (data) => {
     console.log('데이터')
     console.log(data)
@@ -102,7 +115,7 @@ const logOutRequest = createAsyncThunk('userLogOut', async (navigation, {dispatc
     return data;
 })
 
-const temporaryPasswordRequest = createAsyncThunk('userLogIn', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+const temporaryPasswordRequest = createAsyncThunk('temporaryPassword', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
     temporaryPassword(data.email).then(function(res) {
     
         if (res.code === 200) {
@@ -118,7 +131,7 @@ const temporaryPasswordRequest = createAsyncThunk('userLogIn', async (data, {dis
 })
 
 
-const sendEmailAuthCodeRequest = createAsyncThunk('userLogIn', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+const sendEmailAuthCodeRequest = createAsyncThunk('sendEmailAuthCode', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
     console.log(data)
     sendEmailAuthCode(data.email).then(function(res) {
         console.log(res)
@@ -134,7 +147,7 @@ const sendEmailAuthCodeRequest = createAsyncThunk('userLogIn', async (data, {dis
     })
 })
 
-const snsLoginRequset = createAsyncThunk('userLogIn', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+const snsLoginRequset = createAsyncThunk('snsLogin', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
     // try catch 는 하지말아야 에러를 캐치할수 있다.
     // 상단 파라미터중 data는 요청시 들어온 파라미터이다. 저 파라미터를 가지고 서버에 데이터 요청하면된다.
     //const state = getState(); // 상태가져오기
@@ -161,7 +174,7 @@ const snsLoginRequset = createAsyncThunk('userLogIn', async (data, {dispatch, ge
     })
 })
 
-const registerRequest = createAsyncThunk('userLogIn', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+const registerRequest = createAsyncThunk('register', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
     register(data).then(function(res) {
         let result =  {
             accessToken: res.headers.accesstoken,
@@ -187,5 +200,12 @@ const registerRequest = createAsyncThunk('userLogIn', async (data, {dispatch, ge
     })
 })
 
+const emailDoubleCheckRequest = createAsyncThunk('emailDoubleCheck', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+    emailDoubleCheck(data).then(function(res) {
+        return res;
+    })
+})
 
-export {snsLoginRequset, logOutRequest, sendEmailAuthCodeRequest, temporaryPasswordRequest, registerRequest}
+
+
+export {snsLoginRequset, logOutRequest, sendEmailAuthCodeRequest, temporaryPasswordRequest, registerRequest, emailDoubleCheckRequest}

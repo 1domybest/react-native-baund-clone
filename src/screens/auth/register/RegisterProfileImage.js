@@ -42,13 +42,17 @@ const RegisterProfileImage = (props) => {
 
     const beforeUploadBackgroundImage = () => {
         launchImageLibrary({}, function (res) {
-            setBackgroundImage(res.assets[0])
+            if (res.assets) {
+                setBackgroundImage(res.assets[0])
+            }
         })
     }
 
     const beforeUploadProfileImage = () => {
         launchImageLibrary({}, function (res) {
-            setProfileImage(res.assets[0])
+            if (res.assets) {
+                setProfileImage(res.assets[0])   
+            }
         })
     }
 
