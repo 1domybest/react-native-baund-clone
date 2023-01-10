@@ -20,7 +20,22 @@ const register = async (data) => {
     return new Promise(function (resolve, reject) {
         axios.post('http://localhost:8080/api/common/user/register', data, {withCredentials: true})
         .then(async function(res) {
-            resolve(res);
+            if (result.data.code === 200) {
+                let token =  {
+                    accessToken: result.headers.accesstoken,
+                    refreshToken: result.headers.refreshtoken,
+                    loading: false,
+                }
+                await $Util.setStoreData('token', token);
+                Alert.alert(
+                    result.data.message,
+                    '완료',
+                    [
+                        {text: '확인'}
+                    ]
+                )
+                return token;
+            }
         }).catch ((error) => {
             reject (error.response.data);
             alert(error.response.data.message);
@@ -57,8 +72,24 @@ const login = async (params) => {
     return new Promise (function (resolve, reject) {
      axios.post('http://localhost:8080/api/common/user/login', params, {withCredentials: true})
         .then(async function(res) {
-            if (res.data.code === 200) { // 정상 코드가 들어올시 비지니스로직 진행
-                resolve(res);
+            if (res.data.code === 200) {
+                let result =  {
+                    accessToken: res.headers.accesstoken,
+                    refreshToken: res.headers.refreshtoken,
+                    loading: false,
+                }
+                $Util.setStoreData('token', {
+                    accessToken: res.headers.accesstoken,
+                    refreshToken: res.headers.refreshtoken,
+                });
+                Alert.alert(
+                    res.data.message,
+                    '완료',
+                    [
+                        {text: '확인'}
+                    ]
+                )
+                return result;
             }
         }).catch(error => {
             Alert.alert(error.response.data.message);
@@ -72,12 +103,29 @@ const snsLogin = async (params) => {
      axios.post('http://localhost:8080/api/common/user/snsLogin', params, {withCredentials: true})
         .then(async function(res) {
             if (res.data.code === 200) { // 정상 코드가 들어올시 비지니스로직 진행
-                resolve(res);
+                let result =  {
+                    accessToken: res.headers.accesstoken,
+                    refreshToken: res.headers.refreshtoken,
+                    loading: false,
+                }
+                $Util.setStoreData('token', {
+                    accessToken: res.headers.accesstoken,
+                    refreshToken: res.headers.refreshtoken,
+                });
+
+                Alert.alert(
+                    res.data.message,
+                    '로그인',
+                    [
+                        {text: '확인'}
+                    ]
+                )
+                resolve(result);
             }
         }).catch(error => {
-            if (error.response.data.code !== 303) { // 일반회원이 아니면
+            reject (error.response.data)
+            if (error.response.data.code !== 426) { // 일반회원이 아니면
                 alert(error.response.data.message);
-                reject (error.response.data) ;
             } else {
                 Alert.alert(
                     error.response.data.message,
@@ -89,7 +137,6 @@ const snsLogin = async (params) => {
                         },
                         {
                             text: '취소',
-                            onPress: () => {reject (error.response.data);},
                             style: "cancel"
                         },
                     ],
@@ -159,75 +206,24 @@ const loginRequset = createAsyncThunk('login', async (params, {dispatch, getStat
     // 상단 파라미터중 data는 요청시 들어온 파라미터이다. 저 파라미터를 가지고 서버에 데이터 요청하면된다.
     //const state = getState(); // 상태가져오기
     login(params).then(function(res) {
-        let result =  {
-            accessToken: res.headers.accesstoken,
-            refreshToken: res.headers.refreshtoken,
-            loading: false,
-        }
-        $Util.setStoreData('token', {
-            accessToken: res.headers.accesstoken,
-            refreshToken: res.headers.refreshtoken,
-        });
-        if (res.data.code === 200) {
-            Alert.alert(
-                res.data.message,
-                '완료',
-                [
-                    {text: '확인'}
-                ]
-            )
-        }
-        return result;
+       return res;
     })
 })
 
-const snsLoginRequset = createAsyncThunk('snsLogin', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+const snsLoginRequset = createAsyncThunk('userLogIn', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
     // try catch 는 하지말아야 에러를 캐치할수 있다.
     // 상단 파라미터중 data는 요청시 들어온 파라미터이다. 저 파라미터를 가지고 서버에 데이터 요청하면된다.
-    //const state = getState(); // 상태가져오기
-    snsLogin(params).then(function(res) {
-        let result =  {
-            accessToken: res.headers.accesstoken,
-            refreshToken: res.headers.refreshtoken,
-            loading: false,
-        }
-        $Util.setStoreData('token', {
-            accessToken: res.headers.accesstoken,
-            refreshToken: res.headers.refreshtoken,
-        });
-        if (res.code === 200) {
-            Alert.alert(
-                res.message,
-                '완료',
-                [
-                    {text: '확인'}
-                ]
-            )
-        }
-        return result;
-    })
+    const state = getState(); // 상태가져오기
+
+    let result = await snsLogin(params);
+
+    return result;
 })
+
 
 const registerRequest = createAsyncThunk('register', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
     let result = await register(data);
-    if (result.data.code === 200) {
-        let token =  {
-            accessToken: result.headers.accesstoken,
-            refreshToken: result.headers.refreshtoken,
-            loading: false,
-        }
-        await $Util.setStoreData('token', token);
-        Alert.alert(
-            result.data.message,
-            '완료',
-            [
-                {text: '확인'}
-            ]
-        )
-        return token;
-    } else {
-        return result.data
-    }
+    return result;
 })
 
 const emailDoubleCheckRequest = createAsyncThunk('emailDoubleCheck', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {

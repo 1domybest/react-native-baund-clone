@@ -41,11 +41,14 @@ const themeSlicer = createSlice({
             state.loading = true;
         });
         builder.addCase(snsLoginRequset.fulfilled, (state, action) => {
-            state.accessToken = action.payload.accessToken;
-            state.refreshToken = action.payload.refreshToken;
+            console.log('성공')
+            console.log(action)
+            // state.accessToken = action.payload.accessToken;
+            // state.refreshToken = action.payload.refreshToken;
             state.loading = false;
         });
         builder.addCase(snsLoginRequset.rejected, (state, action) => {
+            console.log('실패')
             state.loading = false;
             state.accessToken = null;
             state.refreshToken = null;
