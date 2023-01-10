@@ -4,37 +4,32 @@ import {Alert} from 'react-native'
 import * as $Util from '../constants/utils'
 import {ROUTES} from '../constants/routes'
 
-
 const emailDoubleCheck = (data) => {
      return new Promise(function (resolve, reject) {
         axios.post('http://localhost:8080/api/common/user/userEmailDoubleCheck', data, {withCredentials: true})
         .then(async function(res) {
             resolve(res);
         }).catch ((error) => {
-            alert(error.response.data.message);
             reject (error.response.data) ;
+            alert(error.response.data.message);
         })
      })
 }
 
 const register = async (data) => {
-    console.log('데이터')
-    console.log(data)
     return new Promise(function (resolve, reject) {
         axios.post('http://localhost:8080/api/common/user/register', data, {withCredentials: true})
         .then(async function(res) {
-            console.log(res)
             resolve(res);
         }).catch ((error) => {
+            reject (error.response.data);
             alert(error.response.data.message);
-            reject (error.response.data) ;
         })
     })
 }
 
 
 const sendEmailAuthCode = async (email) => {
-    console.log(email)
     return new Promise(function (resolve, reject) {
         axios.post('http://localhost:8080/api/common/user/sendEmailAuthCode', {to: email}, {withCredentials: true})
         .then(async function(res) {
@@ -132,9 +127,7 @@ const temporaryPasswordRequest = createAsyncThunk('temporaryPassword', async (da
 
 
 const sendEmailAuthCodeRequest = createAsyncThunk('sendEmailAuthCode', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
-    console.log(data)
     sendEmailAuthCode(data.email).then(function(res) {
-        console.log(res)
         if (res.code === 200) {
             Alert.alert(
                 res.message,
@@ -175,35 +168,39 @@ const snsLoginRequset = createAsyncThunk('snsLogin', async (data, {dispatch, get
 })
 
 const registerRequest = createAsyncThunk('register', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
-    register(data).then(function(res) {
-        let result =  {
-            accessToken: res.headers.accesstoken,
-            refreshToken: res.headers.refreshtoken,
+    let result = await register(data);
+    if (result.data.code === 200) {
+        let token =  {
+            accessToken: result.headers.accesstoken,
+            refreshToken: result.headers.refreshtoken,
             loading: false,
         }
-        $Util.setStoreData('token', {
-            accessToken: res.headers.accesstoken,
-            refreshToken: res.headers.refreshtoken,
-        });
-        console.log('결과=');
-        console.log(result);
-        if (res.code === 200) {
-            Alert.alert(
-                res.message,
-                '완료',
-                [
-                    {text: '확인'}
-                ]
-            )
-        }
-        return result;
-    })
+        await $Util.setStoreData('token', token);
+        Alert.alert(
+            result.data.message,
+            '완료',
+            [
+                {text: '확인'}
+            ]
+        )
+        return token;
+    } else {
+        return result.data
+    }
 })
 
 const emailDoubleCheckRequest = createAsyncThunk('emailDoubleCheck', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
-    emailDoubleCheck(data).then(function(res) {
-        return res;
-    })
+    let result = await emailDoubleCheck(data);
+    let type = data.type
+    if (result.data.code === 200) {
+        let params = {navigation: data.navigation, email: data.email}
+        if (type === 'findPassword') {
+            dispatch(temporaryPasswordRequest(params))
+          } else if (type === 'register') {
+            dispatch(sendEmailAuthCodeRequest(params))
+          }
+    }
+    return true;
 })
 
 

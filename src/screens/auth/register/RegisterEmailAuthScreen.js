@@ -14,20 +14,12 @@ const RegisterEmailAuthScreen = (props) => {
   const [isBirthFocused, setIsBirthFocused] = useState(false);
   const { StatusBarManager } = NativeModules
   const dispatch = useDispatch();
-  const isExistEmail = useSelector(state => state.userSlicer.isExistEmail)
+
   useEffect(() => {
     Platform.OS == 'ios' ? StatusBarManager.getHeight((statusBarFrameData) => {
         setStatusBarHeight(statusBarFrameData.height)
     }) : null
 }, []);
-
-const sendEmail = (email) => {
-  if (props.route.params.type === 'findPassword') {
-    dispatch(temporaryPasswordRequest({navigation: navigation, email: email}));
-  } else if (props.route.params.type === 'register') {
-    dispatch(sendEmailAuthCodeRequest({navigation: navigation, email: email}));
-  }
-}
 
 const [statusBarHeight, setStatusBarHeight] = useState(0);
 
@@ -35,11 +27,9 @@ const [statusBarHeight, setStatusBarHeight] = useState(0);
     <Formik
       initialValues={{ email: '' }}
       validateOnMount={true}
-      onSubmit={async values => {
-        dispatch(emailDoubleCheckRequest({email: values.email}));
-        if (isExistEmail) {
-          sendEmail(values.email); 
-        }
+      onSubmit={values => {
+        let params = {navigation: navigation,email: values.email, type: props.route.params.type};
+        dispatch(emailDoubleCheckRequest(params));
       }}
       validationSchema={emailValidationSchema}
     >
