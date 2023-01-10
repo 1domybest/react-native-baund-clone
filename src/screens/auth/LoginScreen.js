@@ -9,6 +9,7 @@ import { CheckBox } from '@rneui/themed';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import {ROUTES} from '../../constants/routes'
+import * as $Util from '../../constants/utils'
 const LoginScreen = (props) => {
     const { navigation } = props;
     const windowWidth = Dimensions.get('window').width;
@@ -18,8 +19,8 @@ const LoginScreen = (props) => {
     const [shown, setShown] = useState(false);
     const [isPwFocused, setIsPwFocused] = useState(false);
     const { StatusBarManager } = NativeModules
-    const [checked, setChecked] = React.useState(false);
-
+    const [checked, setChecked] = useState(false);
+    const [savedEmail, setSavedEmail] = useState("");
 
     useEffect(() => {
         Platform.OS == 'ios' ? StatusBarManager.getHeight((statusBarFrameData) => {
@@ -27,6 +28,21 @@ const LoginScreen = (props) => {
         }) : null
     }, []);
 
+    $Util.getStoreData('savedEmail').then(async function (res) {
+        if ($Util.isEmpty(res)) {
+            $Util.setStoreData('savedEmail', {email : ""});
+        } else {
+            await setSavedEmail(res.email)
+            setChecked(true)
+        }
+    })
+
+    
+    if ($Util.getStoreData('savedEmail').email !== undefined) {
+        setChecked(true)
+        setSavedEmail(JSON.parse($Util.getStoreData("savedEmail")).email)
+    }
+    
     function toggleShown() {
         setShown(!shown)
     }
@@ -34,12 +50,17 @@ const LoginScreen = (props) => {
 
     const [statusBarHeight, setStatusBarHeight] = useState(0);
 
+    
     return (
         <Formik
-            initialValues={{ email: '', password: '' }}
+            initialValues={{ email: savedEmail, password: '' }}
             validateOnMount={true}
-            onSubmit={values => {
-                console.log(values)
+            onSubmit={async values => {
+                if (checked) {
+                    await $Util.setStoreData('savedEmail', {email : values.email});
+                } else {
+                    await $Util.setStoreData('savedEmail', {email : ""});
+                }
             }}
             validationSchema={loginValidationSchema}
         >
@@ -140,7 +161,7 @@ const loginValidationSchema = yup.object().shape({
     email: yup.string().required("이메일을 입력해주세요").email("올바른 이메일을 작성해주세요"),
     password: yup.string().required("비밀번호를 입력해주세요")
     .min(8, ({ min }) => "비밀번호는 최소 " + min + " 자리 이상입니다.")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/, '영문 대소문자,숫자 특수문자 포함 8-20자이내')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/, '영문 대소문자,숫자 특수문자 포함 8-20자이내')
 })
 
 export default LoginScreen
