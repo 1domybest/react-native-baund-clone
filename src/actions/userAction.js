@@ -43,7 +43,7 @@ const sendEmailAuthCode = async (email) => {
 
 const temporaryPassword = async (email) => {
     return new Promise(function (resolve, reject) {
-        axios.post('http://192.168.219.141:8080/api/common/user/temporaryPassword', {to: email}, {withCredentials: true})
+        axios.post('http://localhost:8080/api/common/user/temporaryPassword', {to: email}, {withCredentials: true})
         .then(async function(res) {
             resolve(res.data.data.emailAuthCode);
         }).catch ((error) => {
@@ -53,12 +53,26 @@ const temporaryPassword = async (email) => {
     })
 }
 
-const snsLogin = async (params) => {
+const login = async (params) => {
     return new Promise (function (resolve, reject) {
-     axios.post('http://192.168.219.141:8080/api/common/user/snsLogin', params, {withCredentials: true})
+     axios.post('http://localhost:8080/api/common/user/login', params, {withCredentials: true})
         .then(async function(res) {
             if (res.data.code === 200) { // 정상 코드가 들어올시 비지니스로직 진행
-                resolve(result);
+                resolve(res);
+            }
+        }).catch(error => {
+            Alert.alert(error.response.data.message);
+            reject (error.response.data) ;
+        })
+    })
+}
+
+const snsLogin = async (params) => {
+    return new Promise (function (resolve, reject) {
+     axios.post('http://localhost:8080/api/common/user/snsLogin', params, {withCredentials: true})
+        .then(async function(res) {
+            if (res.data.code === 200) { // 정상 코드가 들어올시 비지니스로직 진행
+                resolve(res);
             }
         }).catch(error => {
             if (error.response.data.code !== 303) { // 일반회원이 아니면
@@ -88,7 +102,7 @@ const snsLogin = async (params) => {
 }
 
 const updateProvider = async (params) => {
-    await axios.post('http://192.168.219.141:8080/api/common/user/updateProvider', params, {withCredentials: true})
+    await axios.post('http://localhost:8080/api/common/user/updateProvider', params, {withCredentials: true})
     .then(function(res) {
         if (res.data.code === 200) { // 정상 코드가 들어올시 비지니스로직 진행
             snsLogin(params)
@@ -110,15 +124,15 @@ const logOutRequest = createAsyncThunk('userLogOut', async (navigation, {dispatc
     return data;
 })
 
-const temporaryPasswordRequest = createAsyncThunk('temporaryPassword', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
-    temporaryPassword(data.email).then(function(res) {
+const temporaryPasswordRequest = createAsyncThunk('temporaryPassword', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+    temporaryPassword(params.email).then(function(res) {
     
         if (res.code === 200) {
             Alert.alert(
                 res.data.message,
                 '인증',
                 [
-                    {text: '확인', onPress: () => data.navigation.navigate(ROUTES.INDEX)}
+                    {text: '확인', onPress: () => params.navigation.navigate(ROUTES.INDEX)}
                 ]
             )
         }
@@ -126,25 +140,52 @@ const temporaryPasswordRequest = createAsyncThunk('temporaryPassword', async (da
 })
 
 
-const sendEmailAuthCodeRequest = createAsyncThunk('sendEmailAuthCode', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
-    sendEmailAuthCode(data.email).then(function(res) {
+const sendEmailAuthCodeRequest = createAsyncThunk('sendEmailAuthCode', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+    sendEmailAuthCode(params.email).then(function(res) {
         if (res.code === 200) {
             Alert.alert(
                 res.message,
                 '인증',
                 [
-                    {text: '확인', onPress: () => data.navigation.navigate(ROUTES.REGISTEREMAILAUTHVALIDATION, {emailAuthCode: res.data.emailAuthCode, email: data.email})}
+                    {text: '확인', onPress: () => params.navigation.navigate(ROUTES.REGISTEREMAILAUTHVALIDATION, {emailAuthCode: res.data.emailAuthCode, email: params.email})}
                 ]
             )
         }
     })
 })
 
-const snsLoginRequset = createAsyncThunk('snsLogin', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+const loginRequset = createAsyncThunk('login', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
     // try catch 는 하지말아야 에러를 캐치할수 있다.
     // 상단 파라미터중 data는 요청시 들어온 파라미터이다. 저 파라미터를 가지고 서버에 데이터 요청하면된다.
     //const state = getState(); // 상태가져오기
-    snsLogin(data).then(function(res) {
+    login(params).then(function(res) {
+        let result =  {
+            accessToken: res.headers.accesstoken,
+            refreshToken: res.headers.refreshtoken,
+            loading: false,
+        }
+        $Util.setStoreData('token', {
+            accessToken: res.headers.accesstoken,
+            refreshToken: res.headers.refreshtoken,
+        });
+        if (res.data.code === 200) {
+            Alert.alert(
+                res.data.message,
+                '완료',
+                [
+                    {text: '확인'}
+                ]
+            )
+        }
+        return result;
+    })
+})
+
+const snsLoginRequset = createAsyncThunk('snsLogin', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+    // try catch 는 하지말아야 에러를 캐치할수 있다.
+    // 상단 파라미터중 data는 요청시 들어온 파라미터이다. 저 파라미터를 가지고 서버에 데이터 요청하면된다.
+    //const state = getState(); // 상태가져오기
+    snsLogin(params).then(function(res) {
         let result =  {
             accessToken: res.headers.accesstoken,
             refreshToken: res.headers.refreshtoken,
@@ -205,4 +246,4 @@ const emailDoubleCheckRequest = createAsyncThunk('emailDoubleCheck', async (data
 
 
 
-export {snsLoginRequset, logOutRequest, sendEmailAuthCodeRequest, temporaryPasswordRequest, registerRequest, emailDoubleCheckRequest}
+export {snsLoginRequset, logOutRequest, sendEmailAuthCodeRequest, temporaryPasswordRequest, registerRequest, emailDoubleCheckRequest, loginRequset}
