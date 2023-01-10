@@ -8,7 +8,7 @@ import { Button } from 'react-native-paper';
 import { CheckBox } from '@rneui/themed';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import {ROUTES} from '../../constants/routes'
+import { ROUTES } from '../../constants/routes'
 import * as $Util from '../../constants/utils'
 const LoginScreen = (props) => {
     const { navigation } = props;
@@ -20,148 +20,251 @@ const LoginScreen = (props) => {
     const [isPwFocused, setIsPwFocused] = useState(false);
     const { StatusBarManager } = NativeModules
     const [checked, setChecked] = useState(false);
-    const [savedEmail, setSavedEmail] = useState("");
-
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [emailValid, setEmailValid] = useState(null);
+    const [passwordValid, setPasswordlValid] = useState(null);
     useEffect(() => {
         Platform.OS == 'ios' ? StatusBarManager.getHeight((statusBarFrameData) => {
             setStatusBarHeight(statusBarFrameData.height)
         }) : null
+        $Util.getStoreData('savedEmail').then(async function (res) {
+            if ($Util.isEmpty(res.email)) {
+                $Util.setStoreData('savedEmail', { email: "" });
+            } else {
+                setEmail(res.email)
+                setEmailValid(true)
+                setChecked(true)
+                console.log(email)
+            }
+        })
     }, []);
 
-    $Util.getStoreData('savedEmail').then(async function (res) {
-        if ($Util.isEmpty(res)) {
-            $Util.setStoreData('savedEmail', {email : ""});
-        } else {
-            await setSavedEmail(res.email)
-            setChecked(true)
-        }
-    })
 
-    
     if ($Util.getStoreData('savedEmail').email !== undefined) {
         setChecked(true)
-        setSavedEmail(JSON.parse($Util.getStoreData("savedEmail")).email)
+        setEmail($Util.getStoreData("savedEmail").email)
     }
-    
+
     function toggleShown() {
         setShown(!shown)
     }
-    
+
+
+    const login = async () => {
+        if (checked) {
+            await $Util.setStoreData('savedEmail', {email : email});
+        } else {
+            await $Util.setStoreData('savedEmail', {email : ""});
+        }
+    }
+
+    const changeEmail = (email) => {
+        let emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+        let emailValid = emailRegExp.test(email);
+        setEmail(email);
+        setEmailValid(emailValid)
+    }
+
+    const changePassword = (password) => {
+        let passwordRegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
+        let passwordValid = passwordRegExp.test(password);
+        setPassword(password)
+        setPasswordlValid(passwordValid)
+    }
 
     const [statusBarHeight, setStatusBarHeight] = useState(0);
 
-    
+
     return (
-        <Formik
-            initialValues={{ email: savedEmail, password: '' }}
-            validateOnMount={true}
-            onSubmit={async values => {
-                if (checked) {
-                    await $Util.setStoreData('savedEmail', {email : values.email});
-                } else {
-                    await $Util.setStoreData('savedEmail', {email : ""});
-                }
-            }}
-            validationSchema={loginValidationSchema}
-        >
-            {({ handleChange, handleBlur, handleSubmit, values, touched, errors, isValid }) => (
+        <View style={styles.container}>
+            <View style={styles.box}>
                 <>
-                    <View style={styles.container}>
-                        <View style={styles.box}>
-                            <>
-                                <View style={isEmailFocused ? styles.activeIdInput : styles.inActiveIdInput}>
-                                    <TextInput
-                                        onFocus={() => setIsEmailFocused(true)}
-                                        onBlur={() => {
-                                            setIsEmailFocused(false)
-                                            handleBlur('email');
-                                        }}
-                                        placeholder="이메일"
-                                        keyboardType="email-address"
-                                        placeholderTextColor='#C5C8CE'
-                                        onChangeText={handleChange('email')}
-                                        value={values.email}
-                                    />
-                                </View>
-                                <View style={{ marginTop: 10 }}>
-                                    <Text style={{ color: 'red' }}>{values.email.length > 0 ? errors.email : ''}</Text>
-                                </View>
-                            </>
-                            <>
-                                <View style={isPwFocused ? styles.activePwInput : styles.inActivePwInput}>
-                                    <TextInput
-                                        style={{ width: '90%' }}
-                                        onFocus={() => setIsPwFocused(true)}
-                                        onBlur={() => {
-                                            handleBlur('password');
-                                            setIsPwFocused(false);
-                                        }}
-                                        placeholder="비밀번호"
-                                        secureTextEntry={!shown ? true : false}
-                                        placeholderTextColor='#C5C8CE'
-                                        onChangeText={handleChange('password')}
-                                        value={values.password}
-                                    />
-                                    <TouchableOpacity style={styles.icon} onPress={() => toggleShown()}>
-                                        <Ionicons onPress={() => toggleShown()} name={shown ? 'eye' : 'eye-off'} size={28} color={isPwFocused ? 'red' : 'black'} />
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={{ marginTop: 10 }}>
-                                    <Text style={{ color: 'red' }}>{values.password.length > 0 ? errors.password : ''}</Text>
-                                </View>
-                            </>
-                        </View>
-                        <KeyboardAvoidingView
-                            style={{ flex: 1, position: 'absolute', bottom: 100, width: '100%' }}
-                            behavior={"padding"}
-                            keyboardVerticalOffset={statusBarHeight + 100}
-                        >
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingRight: 5 }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <CheckBox
-                                        color="white"
-                                        center
-                                        containerStyle={{ backgroundColor: 'transparent' }}
-                                        textStyle={checked ? { color: 'black', fontWeight: 'bold' } : {}}
-                                        title="로그인 정보 저장"
-                                        checked={checked}
-                                        checkedColor="red"
-                                        checkedIcon="dot-circle-o"
-                                        uncheckedIcon="circle-o"
-                                        onPress={() => {
-                                            setChecked(!checked)
-                                        }}
-                                    />
-                                </View>
-                                <View>
-                                    <TouchableOpacity onPress={() => navigation.push(ROUTES.REGISTEREMAILAUTH, {type: 'findPassword'})}>
-                                        <Text style={{ fontSize: 13 }}>비밀번호를 잊으셨나요?</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            <View>
-                                <Button mode="contained" style={isValid ? styles.activeLoginButton : styles.inActiveLoginButton} onPress={() => handleSubmit()} disabled={!isValid}>
-                                    <Text style={{ color: 'white' }}>
-                                        로그인
-                                    </Text>
-                                </Button>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
-                                <Text style={{ marginRight: 10 }}>회원이 아니신가요?</Text>
-                                <Text style={styles.joinText}>회원가입</Text>
-                            </View>
-                        </KeyboardAvoidingView>
+                    <View style={isEmailFocused ? styles.activeIdInput : styles.inActiveIdInput}>
+                        <TextInput
+                            onFocus={() => setIsEmailFocused(true)}
+                            onBlur={() => {setIsEmailFocused(false)}}
+                            placeholder="이메일"
+                            keyboardType="email-address"
+                            placeholderTextColor='#C5C8CE'
+                            onChangeText={(email) => changeEmail(email)}
+                            value={email}
+                        />
+                    </View>
+                    <View style={{ marginTop: 10 }}>
+                        <Text style={{ color: 'red' }}>{emailValid != null && email.length === 0 ? '이메일을 입력해주세요' : emailValid  === false? '정확한 이메일을 입력해주세요': ''}</Text>
                     </View>
                 </>
-            )}</Formik>
+                <>
+                    <View style={isPwFocused ? styles.activePwInput : styles.inActivePwInput}>
+                        <TextInput
+                            style={{ width: '90%' }}
+                            onFocus={() => setIsPwFocused(true)}
+                            onBlur={() => {setIsPwFocused(false);}}
+                            placeholder="비밀번호"
+                            secureTextEntry={!shown ? true : false}
+                            placeholderTextColor='#C5C8CE'
+                            onChangeText={(password) => changePassword(password)}
+                            value={password}
+                        />
+                        <TouchableOpacity style={styles.icon} onPress={() => toggleShown()}>
+                            <Ionicons onPress={() => toggleShown()} name={shown ? 'eye' : 'eye-off'} size={28} color={isPwFocused ? 'red' : 'black'} />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ marginTop: 10 }}>
+                    <Text style={{ color: 'red' }}>{passwordValid != null && password.length === 0 ? '비밀번호룰 입력해주세요' : passwordValid === false ? '영문 대소문자,숫자 특수문자 포함 8-20자이내': ''}</Text>
+                    </View>
+                </>
+            </View>
+            <KeyboardAvoidingView
+                style={{ flex: 1, position: 'absolute', bottom: 100, width: '100%' }}
+                behavior={"padding"}
+                keyboardVerticalOffset={statusBarHeight + 100}
+            >
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingRight: 5 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <CheckBox
+                            color="white"
+                            center
+                            containerStyle={{ backgroundColor: 'transparent' }}
+                            textStyle={checked ? { color: 'black', fontWeight: 'bold' } : {}}
+                            title="로그인 정보 저장"
+                            checked={checked}
+                            checkedColor="red"
+                            checkedIcon="dot-circle-o"
+                            uncheckedIcon="circle-o"
+                            onPress={() => {setChecked(!checked)}}
+                        />
+                    </View>
+                    <View>
+                        <TouchableOpacity onPress={() => navigation.push(ROUTES.REGISTEREMAILAUTH, { type: 'findPassword' })}>
+                            <Text style={{ fontSize: 13 }}>비밀번호를 잊으셨나요?</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <View>
+                    <Button mode="contained" style={emailValid && passwordValid ? styles.activeLoginButton : styles.inActiveLoginButton} onPress={() => {login()}} disabled={!emailValid && !passwordValid}>
+                        <Text style={{ color: 'white' }}>
+                            로그인
+                        </Text>
+                    </Button>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
+                    <Text style={{ marginRight: 10 }}>회원이 아니신가요?</Text>
+                    <Text style={styles.joinText}>회원가입</Text>
+                </View>
+            </KeyboardAvoidingView>
+        </View>
+        // <Formik
+        //     initialValues={{ email: savedEmail, password: '' }}
+        //     validateOnMount={true}
+        //     onSubmit={async values => {
+                // if (checked) {
+                //     await $Util.setStoreData('savedEmail', {email : values.email});
+                // } else {
+                //     await $Util.setStoreData('savedEmail', {email : ""});
+                // }
+        //     }}
+        //     validationSchema={loginValidationSchema}
+        // >
+        //     {({ handleChange, handleBlur, handleSubmit, values, touched, errors, isValid }) => (
+        //         <>
+        //             <View style={styles.container}>
+        //                 <View style={styles.box}>
+        //                     <>
+        //                         <View style={isEmailFocused ? styles.activeIdInput : styles.inActiveIdInput}>
+        //                             <TextInput
+        //                                 onFocus={() => setIsEmailFocused(true)}
+        //                                 onBlur={() => {
+        //                                     setIsEmailFocused(false)
+        //                                     handleBlur('email');
+        //                                 }}
+        //                                 placeholder="이메일"
+        //                                 keyboardType="email-address"
+        //                                 placeholderTextColor='#C5C8CE'
+        //                                 onChangeText={handleChange('email')}
+        //                                 value={values.email}
+        //                             />
+        //                         </View>
+        //                         <View style={{ marginTop: 10 }}>
+        //                             <Text style={{ color: 'red' }}>{values.email.length > 0 ? errors.email : ''}</Text>
+        //                         </View>
+        //                     </>
+        //                     <>
+        //                         <View style={isPwFocused ? styles.activePwInput : styles.inActivePwInput}>
+        //                             <TextInput
+        //                                 style={{ width: '90%' }}
+        //                                 onFocus={() => setIsPwFocused(true)}
+        //                                 onBlur={() => {
+        //                                     handleBlur('password');
+        //                                     setIsPwFocused(false);
+        //                                 }}
+        //                                 placeholder="비밀번호"
+        //                                 secureTextEntry={!shown ? true : false}
+        //                                 placeholderTextColor='#C5C8CE'
+        //                                 onChangeText={handleChange('password')}
+        //                                 value={values.password}
+        //                             />
+        //                             <TouchableOpacity style={styles.icon} onPress={() => toggleShown()}>
+        //                                 <Ionicons onPress={() => toggleShown()} name={shown ? 'eye' : 'eye-off'} size={28} color={isPwFocused ? 'red' : 'black'} />
+        //                             </TouchableOpacity>
+        //                         </View>
+        //                         <View style={{ marginTop: 10 }}>
+        //                             <Text style={{ color: 'red' }}>{values.password.length > 0 ? errors.password : ''}</Text>
+        //                         </View>
+        //                     </>
+        //                 </View>
+        //                 <KeyboardAvoidingView
+        //                     style={{ flex: 1, position: 'absolute', bottom: 100, width: '100%' }}
+        //                     behavior={"padding"}
+        //                     keyboardVerticalOffset={statusBarHeight + 100}
+        //                 >
+        //                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingRight: 5 }}>
+        //                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        //                             <CheckBox
+        //                                 color="white"
+        //                                 center
+        //                                 containerStyle={{ backgroundColor: 'transparent' }}
+        //                                 textStyle={checked ? { color: 'black', fontWeight: 'bold' } : {}}
+        //                                 title="로그인 정보 저장"
+        //                                 checked={checked}
+        //                                 checkedColor="red"
+        //                                 checkedIcon="dot-circle-o"
+        //                                 uncheckedIcon="circle-o"
+        //                                 onPress={() => {
+        //                                     setChecked(!checked)
+        //                                 }}
+        //                             />
+        //                         </View>
+        //                         <View>
+        //                             <TouchableOpacity onPress={() => navigation.push(ROUTES.REGISTEREMAILAUTH, {type: 'findPassword'})}>
+        //                                 <Text style={{ fontSize: 13 }}>비밀번호를 잊으셨나요?</Text>
+        //                             </TouchableOpacity>
+        //                         </View>
+        //                     </View>
+        //                     <View>
+        //                         <Button mode="contained" style={isValid ? styles.activeLoginButton : styles.inActiveLoginButton} onPress={() => handleSubmit()} disabled={!isValid}>
+        //                             <Text style={{ color: 'white' }}>
+        //                                 로그인
+        //                             </Text>
+        //                         </Button>
+        //                     </View>
+        //                     <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
+        //                         <Text style={{ marginRight: 10 }}>회원이 아니신가요?</Text>
+        //                         <Text style={styles.joinText}>회원가입</Text>
+        //                     </View>
+        //                 </KeyboardAvoidingView>
+        //             </View>
+        //         </>
+        //     )}</Formik>
     )
 }
 
 const loginValidationSchema = yup.object().shape({
     email: yup.string().required("이메일을 입력해주세요").email("올바른 이메일을 작성해주세요"),
     password: yup.string().required("비밀번호를 입력해주세요")
-    .min(8, ({ min }) => "비밀번호는 최소 " + min + " 자리 이상입니다.")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/, '영문 대소문자,숫자 특수문자 포함 8-20자이내')
+        .min(8, ({ min }) => "비밀번호는 최소 " + min + " 자리 이상입니다.")
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/, '영문 대소문자,숫자 특수문자 포함 8-20자이내')
 })
 
 export default LoginScreen
