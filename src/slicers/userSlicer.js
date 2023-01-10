@@ -54,7 +54,6 @@ const themeSlicer = createSlice({
             state.loading = true;
         });
         builder.addCase(logOutRequest.fulfilled, (state, action) => {
-            console.log(action)
             state.loading = false;
             state.accessToken = action.payload.accessToken;
             state.refreshToken = action.payload.refreshToken;

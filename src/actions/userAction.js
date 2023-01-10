@@ -173,7 +173,6 @@ const logOutRequest = createAsyncThunk('userLogOut', async (navigation, {dispatc
 
 const temporaryPasswordRequest = createAsyncThunk('temporaryPassword', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
     temporaryPassword(params.email).then(function(res) {
-    
         if (res.code === 200) {
             Alert.alert(
                 res.data.message,
@@ -231,11 +230,7 @@ const emailDoubleCheckRequest = createAsyncThunk('emailDoubleCheck', async (data
     let type = data.type
     if (result.data.code === 200) {
         let params = {navigation: data.navigation, email: data.email}
-        if (type === 'findPassword') {
-            dispatch(temporaryPasswordRequest(params))
-          } else if (type === 'register') {
-            dispatch(sendEmailAuthCodeRequest(params))
-          }
+        dispatch(sendEmailAuthCodeRequest(params))
     }
     return true;
 })

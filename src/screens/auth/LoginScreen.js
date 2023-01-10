@@ -173,7 +173,9 @@ const LoginScreen = (props) => {
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
                     <Text style={{ marginRight: 10 }}>회원이 아니신가요?</Text>
-                    <Text style={styles.joinText}>회원가입</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate(ROUTES.REGISTER)}>
+                        <Text style={styles.joinText}>회원가입</Text>
+                    </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
         </View>

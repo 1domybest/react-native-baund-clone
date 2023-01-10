@@ -28,8 +28,13 @@ const [statusBarHeight, setStatusBarHeight] = useState(0);
       initialValues={{ email: '' }}
       validateOnMount={true}
       onSubmit={values => {
-        let params = {navigation: navigation,email: values.email, type: props.route.params.type};
-        dispatch(emailDoubleCheckRequest(params));
+        if (props.route.params.type === 'findPassword') {
+          let params = {navigation: navigation,email: values.email};
+          dispatch(temporaryPasswordRequest(params));
+        } else {
+          let params = {navigation: navigation,email: values.email};
+          dispatch(emailDoubleCheckRequest(params));
+        }
       }}
       validationSchema={emailValidationSchema}
     >
@@ -64,11 +69,21 @@ const [statusBarHeight, setStatusBarHeight] = useState(0);
               behavior={"padding"}
               keyboardVerticalOffset={statusBarHeight + 100}
             >
-              <Button mode="contained" style={isValid ? styles.activeLoginButton : styles.inActiveLoginButton} onPress={() => handleSubmit()} disabled={!isValid}>
+              {
+                props.route.params.type=== 'findPassword' ?
+                <Button mode="contained" style={isValid ? styles.activeLoginButton : styles.inActiveLoginButton} onPress={() => handleSubmit()} disabled={!isValid}>
                 <Text style={{ color: 'white', fontWeight: 'bold'}}>
-                  {props.route.params.type=== 'findPassword' ? '임시 비밀번호 발급' : '인증번호 발송'}
+                  임시 비밀번호 발급
                 </Text>
               </Button>
+              :
+              <Button mode="contained" style={isValid ? styles.activeLoginButton : styles.inActiveLoginButton} onPress={() => handleSubmit()} disabled={!isValid}>
+                <Text style={{ color: 'white', fontWeight: 'bold'}}>
+                  인증번호 발송
+                </Text>
+              </Button>
+              }
+              
             </KeyboardAvoidingView>
           </View>
         </>
