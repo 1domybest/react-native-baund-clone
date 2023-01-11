@@ -7,6 +7,7 @@ import {ROUTES} from '../constants/routes'
 import LoginScreen from '../screens/auth/LoginScreen'
 import RegisterNavigation from '../navigation/RegisterNavigation'
 import RegisterEmailAuthScreen from '../screens/auth/register/RegisterEmailAuthScreen'
+import MainNavigation from './MainNavigation'
 const Stack = createNativeStackNavigator();
 
 const theme = createTheme({
@@ -60,6 +61,8 @@ const AuthNavigation = () => {
                  <Stack.Screen name={ROUTES.REGISTEREMAILAUTH} component={RegisterEmailAuthScreen}  options={{headerShown: true, headerTitle: '',}} />
                  <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} options={{headerShown: true, headerTitle: '이메일로 로그인', headerTitleAlign: 'left', }} />
                  <Stack.Screen name={ROUTES.REGISTER} component={RegisterNavigation} options={{headerShown: false}} />
+                 <Stack.Screen name={ROUTES.MAIN} component={MainNavigation} options={{headerShown: false}} />
+                 
             </Stack.Navigator>
         </NavigationContainer>
   </ThemeProvider>

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image , Dimensions, useColorScheme } from 'react-native'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useLayoutEffect} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Divider, Avatar, useThemeMode } from '@rneui/themed';
@@ -19,16 +19,16 @@ const IndexScreen = (props) => {
     const dispatch = useDispatch();
     
     const { mode, setMode } = useThemeMode();
-    nowMode = useColorScheme();
-    useEffect(() => {  // <-- 여기있던 async 는 제거
-        setMode(nowMode)
+
+  
+    useLayoutEffect(() => {
         // --------- 여기부터 -------------
         const isLogined = async () => { // <-- async 추가
             let token = await $Util.getStoreData('token');
             if (!$Util.isEmpty(token)) {
                 console.log(token)
                 if (!$Util.isEmpty(token.accessToken)) {
-                    console.log('로그인한적있음')
+                    navigation.replace(ROUTES.MAIN);
                 } else {
                     console.log('로그인한적 X')    
                 }
@@ -38,6 +38,11 @@ const IndexScreen = (props) => {
         }
         isLogined(); // <----- 여기에서 만든함수를 한번만 호출
         // --------- 여기까지를 원함 -------------
+      }, []);  
+
+    nowMode = useColorScheme();
+    useEffect(() => { 
+        setMode(nowMode)
       },[]);
 
     const [isSigned, setIsSigned] = useState();

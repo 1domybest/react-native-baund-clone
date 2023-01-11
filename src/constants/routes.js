@@ -4,6 +4,7 @@ const TEST = 'test'
 const INDEX = 'index'
 const LOGIN = 'login'
 const REGISTER = 'register'
+const MAIN = 'main'
 
 const REGISTERBIRTHDAY = 'registerBirthDay'
 const REGISTEREMAILAUTH = 'registerEmailAuth'
@@ -29,10 +30,14 @@ const NEWFEEDTAB = 'newFeedTab'
 
 export const ROUTES = {
     TEST,
+
+    //navigation
     INDEX,
     LOGIN,
-
-    // register
+    FORGOTPASSWORD,
+    MAIN,
+    
+    // navigation/register
     REGISTER,
     REGISTEREMAILAUTH,
     REGISTEREMAILAUTHVALIDATION,
@@ -42,15 +47,9 @@ export const ROUTES = {
     REGISTERNICKNAME,
     REGISTERPROFILEIMAGE,
     
-    FORGOTPASSWORD,
+    // navigation/main
 
+    
     HOME,
-    SEARCH,
-    PLAY,
-    CART,
-    MYPAGE,
-
-    // home
-    MAINTAB,
-    NEWFEEDTAB
+    
 }
