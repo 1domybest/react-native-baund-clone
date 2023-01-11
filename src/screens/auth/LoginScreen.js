@@ -1,6 +1,5 @@
-import { Text, TextInput, View, KeyboardAvoidingView, NativeModules, Alert } from 'react-native'
+import { Text, TextInput, View, KeyboardAvoidingView, NativeModules, Alert, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Dimensions } from 'react-native'
 import { makeStyles } from '@rneui/themed';
 import { Button } from 'react-native-paper';
 import { CheckBox } from '@rneui/themed';

@@ -6,6 +6,7 @@ import { Divider, Avatar, useThemeMode } from '@rneui/themed';
 import {ROUTES} from '../../constants/routes'
 import {snsLoginRequset} from '../../actions/userAction'
 import { useDispatch, useSelector } from 'react-redux';
+import * as $Util from '../../constants/utils'
 import {   
     GoogleSignin,
     statusCodes,
@@ -21,6 +22,20 @@ const IndexScreen = (props) => {
     nowMode = useColorScheme();
     useEffect(() => {
         setMode(nowMode)
+        const isLogined = async () => {
+            let token = await $Util.getStoreData('token');
+            if (!$Util.isEmpty(token)) {
+                console.log(token)
+                if (!$Util.isEmpty(token.accessToken)) {
+                    console.log('로그인한적있음')
+                } else {
+                    console.log('로그인한적 X')    
+                }
+            } else {
+                await $Util.setStoreData('token', {accessToken: null, refreshToken: null})
+            }
+        }
+        isLogined();
       },[]);
 
     const [isSigned, setIsSigned] = useState();
