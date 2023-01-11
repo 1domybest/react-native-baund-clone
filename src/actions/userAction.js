@@ -56,10 +56,20 @@ const sendEmailAuthCode = async (email) => {
     })
 }
 
-const temporaryPassword = async (email) => {
+const temporaryPassword = async (email, navigation) => {
     return new Promise(function (resolve, reject) {
         axios.post('http://localhost:8080/api/common/user/temporaryPassword', {to: email}, {withCredentials: true})
         .then(async function(res) {
+            console.log(res.data)
+            if (res.data.code === 200) {
+                Alert.alert(
+                    res.data.message,
+                    '인증',
+                    [
+                        {text: '확인', onPress: () => navigation.navigate(ROUTES.INDEX)}
+                    ]
+                )
+            }
             resolve(res.data.data.emailAuthCode);
         }).catch ((error) => {
             alert(error.response.data.message);
@@ -172,17 +182,8 @@ const logOutRequest = createAsyncThunk('userLogOut', async (navigation, {dispatc
 })
 
 const temporaryPasswordRequest = createAsyncThunk('temporaryPassword', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
-    temporaryPassword(params.email).then(function(res) {
-        if (res.code === 200) {
-            Alert.alert(
-                res.data.message,
-                '인증',
-                [
-                    {text: '확인', onPress: () => params.navigation.navigate(ROUTES.INDEX)}
-                ]
-            )
-        }
-    })
+    let result = await temporaryPassword(params.email, params.navigation)
+    return result;
 })
 
 
