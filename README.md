@@ -7,6 +7,10 @@
 - [AWS S3 를 이용한 프로필 사진 업로드 기능]
 - [임시비밀번호, 이메일 인증번호 spring boot nodeMailer 를 사용해 구현]
 
+# 백엔드
+
+- https://github.com/1domybest/react-native-baund-clone-backEnd.git
+
 # 미리보기
 
 - 로그인
