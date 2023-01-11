@@ -7,8 +7,8 @@ const initialState = {
     loading: false,
 }
 
-const themeSlicer = createSlice({
-    name: 'userSlice',
+const userSlicer = createSlice({
+    name: 'userSlicer',
     initialState: initialState,
     reducers: { // 동기적인  액션을 넣는다.   내부적인 액션
         setToken (state, action) {
@@ -65,4 +65,4 @@ const themeSlicer = createSlice({
         });
     },
 });
-export default themeSlicer;
+export default userSlicer;
