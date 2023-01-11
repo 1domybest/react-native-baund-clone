@@ -20,7 +20,6 @@ const EmailAuthValidationScreen = (props) => {
     }) : null
 }, []);
 
-console.log(props.route.params)
 
 const [statusBarHeight, setStatusBarHeight] = useState(0);
   return (
@@ -32,7 +31,6 @@ const [statusBarHeight, setStatusBarHeight] = useState(0);
            Alert.alert('인증되었습니다.', '인증되었습니다'[
             {
               text: '확인',
-              onPress: () => console.log('확인')
             }
           ])
           navigation.popToTop();

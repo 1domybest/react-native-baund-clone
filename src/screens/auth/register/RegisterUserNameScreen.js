@@ -22,9 +22,6 @@ const RegisterUserNameScreen = (props) => {
         }) : null
     }, []);
 
-
-    console.log(props.route.params)
-
     const [statusBarHeight, setStatusBarHeight] = useState(0);
 
     return (
@@ -32,7 +29,6 @@ const RegisterUserNameScreen = (props) => {
             initialValues={{ userName: ''}}
             validateOnMount={true}
             onSubmit={values => {
-                console.log(values)
                 navigation.navigate(ROUTES.REGISTERPROFILEIMAGE, {email: props.route.params.email, nickName : props.route.params.nickName, userName: values.userName, password: props.route.params.password})
             }}
             validationSchema={loginValidationSchema}

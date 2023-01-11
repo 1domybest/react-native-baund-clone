@@ -24,8 +24,6 @@ const RegisterProfileImage = (props) => {
     const [backgroundImage, setBackgroundImage] = useState(null);
 
 
-    
-    console.log(props.route.params)
 
     const fileUpload = async (rawFile, type) => {
         const base64 = await fs.readFile(rawFile.uri, 'base64');
@@ -90,7 +88,13 @@ const RegisterProfileImage = (props) => {
             profileImageFile: profileImageFile,
             backgroundImageFile: backgrooundImageFile,
         }
-        dispatch(registerRequest(data));
+
+        let params = {
+            data: data,
+            navigation: navigation
+        }
+
+        dispatch(registerRequest(params));
     }
 
 

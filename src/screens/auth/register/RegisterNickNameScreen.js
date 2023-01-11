@@ -25,7 +25,6 @@ const RegisterNickNameScreen = (props) => {
         }) : null
     }, []);
 
-    console.log(props.route.params)
 
     const [statusBarHeight, setStatusBarHeight] = useState(0);
 

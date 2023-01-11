@@ -16,25 +16,26 @@ const emailDoubleCheck = (data) => {
      })
 }
 
-const register = async (data) => {
+const register = async (params, navigation) => {
     return new Promise(function (resolve, reject) {
-        axios.post('http://localhost:8080/api/common/user/register', data, {withCredentials: true})
+        axios.post('http://localhost:8080/api/common/user/register', params, {withCredentials: true})
         .then(async function(res) {
-            if (result.data.code === 200) {
-                let token =  {
-                    accessToken: result.headers.accesstoken,
-                    refreshToken: result.headers.refreshtoken,
+            console.log(res.data)
+            if (res.data.code === 200) {
+                let result =  {
+                    accessToken: res.headers.accesstoken,
+                    refreshToken: res.headers.refreshtoken,
                     loading: false,
                 }
-                await $Util.setStoreData('token', token);
+                await $Util.setStoreData('token', result);
                 Alert.alert(
-                    result.data.message,
+                    res.data.message,
                     '완료',
                     [
                         {text: '확인'}
                     ]
                 )
-                return token;
+                resolve(result)
             }
         }).catch ((error) => {
             reject (error.response.data);
@@ -44,10 +45,19 @@ const register = async (data) => {
 }
 
 
-const sendEmailAuthCode = async (email) => {
+const sendEmailAuthCode = async (email, navigation) => {
     return new Promise(function (resolve, reject) {
         axios.post('http://localhost:8080/api/common/user/sendEmailAuthCode', {to: email}, {withCredentials: true})
         .then(async function(res) {
+            if (res.data.code === 200) {
+                Alert.alert(
+                    res.message,
+                    '인증',
+                    [
+                        {text: '확인', onPress: () => navigation.navigate(ROUTES.REGISTEREMAILAUTHVALIDATION, {emailAuthCode: res.data.data.emailAuthCode, email: email})}
+                    ]
+                )
+            }
             resolve(res.data);
         }).catch ((error) => {
             alert(error.response.data.message);
@@ -99,7 +109,7 @@ const login = async (params) => {
                         {text: '확인'}
                     ]
                 )
-                return result;
+                resolve(result);
             }
         }).catch(error => {
             Alert.alert(error.response.data.message);
@@ -188,17 +198,8 @@ const temporaryPasswordRequest = createAsyncThunk('temporaryPassword', async (pa
 
 
 const sendEmailAuthCodeRequest = createAsyncThunk('sendEmailAuthCode', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
-    sendEmailAuthCode(params.email).then(function(res) {
-        if (res.code === 200) {
-            Alert.alert(
-                res.message,
-                '인증',
-                [
-                    {text: '확인', onPress: () => params.navigation.navigate(ROUTES.REGISTEREMAILAUTHVALIDATION, {emailAuthCode: res.data.emailAuthCode, email: params.email})}
-                ]
-            )
-        }
-    })
+    let result = sendEmailAuthCode(params.email, params.navigation);
+    return result;
 })
 
 const loginRequset = createAsyncThunk('login', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
@@ -221,14 +222,13 @@ const snsLoginRequset = createAsyncThunk('userLogIn', async (params, {dispatch, 
 })
 
 
-const registerRequest = createAsyncThunk('register', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
-    let result = await register(data);
+const registerRequest = createAsyncThunk('register', async (params, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
+    let result = await register(params.data, params.navigation);
     return result;
 })
 
 const emailDoubleCheckRequest = createAsyncThunk('emailDoubleCheck', async (data, {dispatch, getState, rejectWithValue, fulfillWithValue}) => {
     let result = await emailDoubleCheck(data);
-    let type = data.type
     if (result.data.code === 200) {
         let params = {navigation: data.navigation, email: data.email}
         dispatch(sendEmailAuthCodeRequest(params))
