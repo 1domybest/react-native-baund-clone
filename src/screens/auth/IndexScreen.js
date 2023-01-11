@@ -20,9 +20,10 @@ const IndexScreen = (props) => {
     
     const { mode, setMode } = useThemeMode();
     nowMode = useColorScheme();
-    useEffect(() => {
+    useEffect(() => {  // <-- 여기있던 async 는 제거
         setMode(nowMode)
-        const isLogined = async () => {
+        // --------- 여기부터 -------------
+        const isLogined = async () => { // <-- async 추가
             let token = await $Util.getStoreData('token');
             if (!$Util.isEmpty(token)) {
                 console.log(token)
@@ -35,7 +36,8 @@ const IndexScreen = (props) => {
                 await $Util.setStoreData('token', {accessToken: null, refreshToken: null})
             }
         }
-        isLogined();
+        isLogined(); // <----- 여기에서 만든함수를 한번만 호출
+        // --------- 여기까지를 원함 -------------
       },[]);
 
     const [isSigned, setIsSigned] = useState();

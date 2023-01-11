@@ -1,5 +1,6 @@
 import { Text, TextInput, View, KeyboardAvoidingView, NativeModules, Alert, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
+
 import { makeStyles } from '@rneui/themed';
 import { Button } from 'react-native-paper';
 import { CheckBox } from '@rneui/themed';
@@ -244,12 +245,12 @@ const useStyles = makeStyles((theme, props) => ({
     },
     activeLoginButton: {
         marginTop: 10,
-        backgroundColor: theme.colors.grey4,
+        backgroundColor: theme.colors.grey1,
         borderRadius: 10,
     },
     inActiveLoginButton: {
         marginTop: 10,
-        backgroundColor: theme.colors.grey1,
+        backgroundColor: theme.colors.grey4,
         borderRadius: 10,
     },
     joinText: {

@@ -125,7 +125,7 @@ const loginValidationSchema = yup.object().shape({
     password: yup.string().required("비밀번호를 입력해주세요")
         .min(8, ({ min }) => "비밀번호는 최소 " + min + " 자리 이상입니다.")
         .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/, '영문 대소문자,숫자 특수문자 포함 8-20자이내'),
-    rePassword: yup.string().oneOf([yup.ref('password'), null],
+    rePassword: yup.string().required().oneOf([yup.ref('password'), null],
     '비밀번호가 일치하지 않습니다.')
 })
 
@@ -200,7 +200,7 @@ const useStyles = makeStyles((theme, props) => ({
     },
     activeButton: {
         marginTop: 10, 
-        backgroundColor: theme.colors.grey4,
+        backgroundColor: theme.colors.grey1,
         width: '100%',
         borderRadius: 10,
         height: 50,
@@ -209,7 +209,7 @@ const useStyles = makeStyles((theme, props) => ({
      inActiveButton: {
         marginTop: 10, 
         width: '100%',
-        backgroundColor: theme.colors.grey1,
+        backgroundColor: theme.colors.grey4,
         borderRadius: 10,
         height: 50,
         justifyContent: 'center'
