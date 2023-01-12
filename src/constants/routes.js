@@ -16,13 +16,12 @@ const REGISTERPROFILEIMAGE = 'registerProfileImage'
 
 const FORGOTPASSWORD = 'forgotPassword'
 
-// BottomNavigation
+// MainNavigation
 const HOME = 'home'
-const SEARCH = 'search'
-const PLAY = 'play'
-const CART = 'cart'
-const MYPAGE = 'myPage'
-
+const COMMUNITY = 'community'
+const CAMERA = 'camera'
+const ACTIVITY = 'activity'
+const PROFILE = 'profile'
 
 // home
 const MAINTAB = 'mainTab'
@@ -47,9 +46,11 @@ export const ROUTES = {
     REGISTERNICKNAME,
     REGISTERPROFILEIMAGE,
     
-    // navigation/main
-
-    
+    // navigation/main    
     HOME,
+    COMMUNITY,
+    CAMERA,
+    ACTIVITY,
+    PROFILE
     
 }
