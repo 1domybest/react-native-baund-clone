@@ -6,7 +6,7 @@ const CommuntiyScreen = () => {
     return (
         <SafeAreaView>
             <View>
-                <Text>HomeScreen</Text>
+                <Text>커뮤니티</Text>
             </View>
         </SafeAreaView>
     )

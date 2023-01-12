@@ -6,7 +6,7 @@ const CameraScreen = () => {
     return (
         <SafeAreaView>
             <View>
-                <Text>HomeScreen</Text>
+                <Text>카메라</Text>
             </View>
         </SafeAreaView>
     )

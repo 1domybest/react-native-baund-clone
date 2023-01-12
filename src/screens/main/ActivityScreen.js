@@ -6,7 +6,7 @@ const ActivityScreen = () => {
     return (
         <SafeAreaView>
             <View>
-                <Text>HomeScreen</Text>
+                <Text>활동</Text>
             </View>
         </SafeAreaView>
     )

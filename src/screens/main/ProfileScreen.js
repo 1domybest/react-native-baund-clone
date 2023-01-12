@@ -6,7 +6,7 @@ const ProfileScreen = () => {
     return (
         <SafeAreaView>
             <View>
-                <Text>HomeScreen</Text>
+                <Text>프로필</Text>
             </View>
         </SafeAreaView>
     )
