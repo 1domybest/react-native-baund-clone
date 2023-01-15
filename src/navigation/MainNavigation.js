@@ -7,7 +7,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import {ROUTES} from '../constants/routes'
 import HomeScreen from '../screens/main/HomeScreen'
 import CommuntiyScreen from '../screens/main/CommuntiyScreen'
-import CameraScreen from '../screens/main/CameraScreen'
+import CameraScreen from '../screens/main/Camera'
 import ActivityScreen from '../screens/main/ActivityScreen'
 import ProfileScreen from '../screens/main/ProfileScreen'
 const Tab = createBottomTabNavigator();
