@@ -50,7 +50,7 @@ const screenOption = {
     },
 }
 
-let initialRouteName = ROUTES.INDEX
+let initialRouteName = ROUTES.MAIN
 
 const AuthNavigation = () => {
   return (

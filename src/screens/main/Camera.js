@@ -17,8 +17,8 @@ import FFmpegWrapper from '../../constants/FFmpegWrapper';
 const SCREEN_WIDTH = Dimensions.get('screen').width; // 화면 width 사이즈
 const SCREEN_HEIGHT = Dimensions.get('screen').height; // 화면 height 사이즈
 export const FRAME_PER_SEC = 1; // 몇초마다 끊을것인지
-export const FRAME_WIDTH = 160; // 하나의 프레임당 width 길이 [노란색 border 의 프레임을 뜻함]
-const TILE_HEIGHT = 80; // 4 sec. 의 높이 길이
+export const FRAME_WIDTH = 80; // 하나의 프레임당 width 길이 [노란색 border 의 프레임을 뜻함]
+const TILE_HEIGHT = 40; // 4 sec. 의 높이 길이
 const TILE_WIDTH = FRAME_WIDTH / 2; // 현재 노란색 프레임의 반크기
 
 const DURATION_WINDOW_DURATION = 2; // 프레임 몇개를 사용할것인지 
