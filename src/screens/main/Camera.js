@@ -42,6 +42,7 @@ const FRAME_STATUS = Object.freeze({
 const Camera = () => {
   const [selectedVideo, setSelectedVideo] = useState(); // {uri: <string>, localFileName: <string>, creationDate: <Date>}
   const [frames, setFrames] = useState(); // <[{status: <FRAME_STATUS>, uri: <string>}]>
+  const [audio, setAudio] = useState(); // <[{status: <FRAME_STATUS>, uri: <string>}]>
 
   const handlePressSelectVideoButton = () => {
     ImagePicker.openPicker({
@@ -56,7 +57,7 @@ const Camera = () => {
     });
   };
 
-  const handleVideoLoad = videoAssetLoaded => { // 영상이 업로드 된후 동작 videoAssetLoaded 안에는 들어온 영상의 정보가 담겨져있다.
+  const handleVideoLoad = async videoAssetLoaded => { // 영상이 업로드 된후 동작 videoAssetLoaded 안에는 들어온 영상의 정보가 담겨져있다.
     const numberOfFrames = Math.ceil(videoAssetLoaded.duration); // 영상의 초를 반올림함  5.758999824523926 -> 6
     setFrames( // 영상이 로드가된후 초마다 만들어진 프레임의 상태를 전부 loading 으로 채워준다.
       Array(numberOfFrames).fill({
@@ -64,7 +65,7 @@ const Camera = () => {
       }),
     );
 
-    FFmpegWrapper.getFrames( // 업로드된 영사을 FFmpeg Command 를 통하여 원하는 초마다 프레임을자르고 반환
+    await FFmpegWrapper.getFrames( // 업로드된 영사을 FFmpeg Command 를 통하여 원하는 초마다 프레임을자르고 반환
       selectedVideo.localFileName, // 업로드된 영상의 이름
       selectedVideo.uri, // 업로드된 영상의 uri
       numberOfFrames, // 프레임의 갯수
@@ -80,6 +81,14 @@ const Camera = () => {
           status: FRAME_STATUS.READY.name.description,
         }));
         setFrames(_frames); // 변경된 값들을 useState 를통해 다시 저장
+      },
+    );
+    await FFmpegWrapper.getAudio( // 업로드된 영사을 FFmpeg Command 를 통하여 원하는 초마다 프레임을자르고 반환
+      selectedVideo.localFileName, // 업로드된 영상의 이름
+      selectedVideo.uri, // 업로드된 영상의 uri
+      filePath => { // successCallback
+        console.log(filePath)
+        setAudio(filePath); // 변경된 값들을 useState 를통해 다시 저장
       },
     );
   };
