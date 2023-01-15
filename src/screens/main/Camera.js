@@ -105,13 +105,14 @@ const Camera = () => {
   };
   const [currentTime, setCurrentTime] = useState(0);
   handleProgress = (progress) => {
-    console.log(progress.currentTime)
+    // console.log(progress.currentTime)
   }
 const onSeeking = (data) => {
   
 };
 const handleScroll = (data) => {
-  setCurrentTime(Math.ceil(data.nativeEvent.contentOffset.x/(FRAME_WIDTH/2)))
+  // setCurrentTime(Math.ceil(data.nativeEvent.contentOffset.x/(FRAME_WIDTH/2)))
+  setCurrentTime(data.nativeEvent.contentOffset.x/(FRAME_WIDTH/2))
 }
   return (
     <SafeAreaView style={styles.mainContainer}>
