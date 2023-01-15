@@ -16,7 +16,7 @@ class FFmpegWrapper {
     errorCallback,
   ) {
     let outputPath = `${RNFS.CachesDirectoryPath}/${localFileName}_%4d.png`; // 업로드된 파일을 캐싱하여 각 초마다 저장했을때의 path 를 등록
-    const ffmpegCommand = `-ss 0 -i ${videoURI} -vf "fps=${FRAME_PER_SEC}/1:round=up,scale=${FRAME_WIDTH}:${FRAME_WIDTH}" -vframes ${frameNumber} ${outputPath}`;
+    const ffmpegCommand = `-ss 0 -i ${videoURI} -vf "fps=${FRAME_PER_SEC}/1:round=up,scale=${FRAME_WIDTH}:-2" -vframes ${frameNumber} ${outputPath}`;
     excute(ffmpegCommand, outputPath,successCallback, errorCallback);
   }
 
@@ -28,7 +28,6 @@ class FFmpegWrapper {
   ) {
     let outputPath = `${RNFS.CachesDirectoryPath}/${localFileName}.mp3`; // 업로드된 파일을 캐싱하여 각 초마다 저장했을때의 path 를 등록
     const ffmpegCommand = `-ss 0 -i ${videoURI} -acodec copy -map 0:a:0 -vn -f rawvideo ${outputPath}`;
-    console.log(videoURI)
     excute(ffmpegCommand, outputPath,successCallback, errorCallback);
   }
 }
