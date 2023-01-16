@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useRef, useState } from 'react';
 import {
   SafeAreaView,
   Dimensions,
@@ -11,20 +11,21 @@ import {
 } from 'react-native';
 
 import ImagePicker from 'react-native-image-crop-picker';
+import { Button } from 'react-native-paper';
 import Video from 'react-native-video';
 import FFmpegWrapper from '../../constants/FFmpegWrapper';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width; // 화면 width 사이즈
 const SCREEN_HEIGHT = Dimensions.get('screen').height; // 화면 height 사이즈
-export const FRAME_PER_SEC = 5; // 몇초마다 끊을것인지
-export const FRAME_WIDTH = 80; // 하나의 프레임당 width 길이 [노란색 border 의 프레임을 뜻함]
+export const FRAME_PER_SEC = 1; // 몇초마다 끊을것인지
+export const FRAME_WIDTH = 40; // 하나의 프레임당 width 길이 [노란색 border 의 프레임을 뜻함]
 const TILE_HEIGHT = 40; // 4 sec. 의 높이 길이
-const TILE_WIDTH = FRAME_WIDTH / 2; // 현재 노란색 프레임의 반크기
+const TILE_WIDTH = FRAME_WIDTH; // 현재 노란색 프레임의 반크기
 
 const DURATION_WINDOW_DURATION = 2; // 프레임 몇개를 사용할것인지 
 const DURATION_WINDOW_BORDER_WIDTH = 4; // 테두리 굵기
 const DURATION_WINDOW_WIDTH =
-  DURATION_WINDOW_DURATION * FRAME_PER_SEC * TILE_WIDTH; // 총 노란색 프레임의 width 길이
+  DURATION_WINDOW_DURATION * 5 * TILE_WIDTH; // 총 노란색 프레임의 width 길이
 const POPLINE_POSITION = '50%'; // 노란색 프레임 중간 노란색 divder 의 위치 선정 50% === center 
 
 const getFileNameFromPath = path => { // 파일 이름 가져오는 함수
@@ -35,8 +36,8 @@ const getFileNameFromPath = path => { // 파일 이름 가져오는 함수
 };
 
 const FRAME_STATUS = Object.freeze({
-  LOADING: {name: Symbol('LOADING')},
-  READY: {name: Symbol('READY')},
+  LOADING: { name: Symbol('LOADING') },
+  READY: { name: Symbol('READY') },
 });
 
 const Camera = () => {
@@ -97,13 +98,28 @@ const Camera = () => {
     if (frame.status === FRAME_STATUS.LOADING.name.description) { // 받은 프레임의 상태가 LOADING 이라면
       return <View style={styles.loadingFrame} key={index} />; // 로딩중인 프레임 반환
     } else { // 받은 프레임의 상태가 READY 이라면
+      var borderTopLeftRadius = 0;
+      var borderBottomLeftRadius = 0;
+      var borderTopRightRadius = 0;
+      var borderBottomRightRadius = 0;
+      if (index === 0) {
+        borderTopLeftRadius = 10;
+        borderBottomLeftRadius = 10;
+      } else if (index === frames.length - 1) {
+        borderTopRightRadius = 10;
+        borderBottomRightRadius = 10;
+      }
       return ( // 정상적인 프레임 반환
         <Image
           key={index}
-          source={{uri: 'file://' + frame.uri}} // 파일은 저장했지만 아이폰 기준으로 file://을 붙여줘야하므로 file 포함애서 반환
+          source={{ uri: 'file://' + frame.uri }} // 파일은 저장했지만 아이폰 기준으로 file://을 붙여줘야하므로 file 포함애서 반환
           style={{
             width: TILE_WIDTH,
             height: TILE_HEIGHT,
+            borderTopLeftRadius: borderTopLeftRadius,
+            borderBottomLeftRadius: borderBottomLeftRadius,
+            borderTopRightRadius: borderTopRightRadius,
+            borderBottomRightRadius: borderBottomRightRadius,
           }}
           onLoad={() => { // 다되면 이미지가 반환됬다고 알림
             console.log('Image loaded');
@@ -112,17 +128,36 @@ const Camera = () => {
       );
     }
   };
+
+  const renderFrameSecond = (frame, index) => {
+    var text = "•"
+    if (index%5 === 0) {
+      text = index + "s"
+    }
+    return (
+      <Text style={{width: FRAME_WIDTH }}>{text}</Text>
+    )
+  }
   const [currentTime, setCurrentTime] = useState(0);
   handleProgress = (progress) => {
     // console.log(progress.currentTime)
   }
-const onSeeking = (data) => {
-  
-};
-const handleScroll = (data) => {
-  // setCurrentTime(Math.ceil(data.nativeEvent.contentOffset.x/(FRAME_WIDTH/2)))
-  setCurrentTime(data.nativeEvent.contentOffset.x/(FRAME_WIDTH/2))
-}
+  const onSeeking = (data) => {
+
+  };
+
+  const [ThumbNailScrollView, setThumbNailScrollView] = useState(null);
+
+  const [x, setX] = useState(null);
+
+  const handleScroll = (data) => {
+    //console.log(ThumbNailScrollView)
+    setX(data.nativeEvent.contentOffset.x)
+    var second = x/FRAME_WIDTH;
+
+    setCurrentTime(data.nativeEvent.contentOffset.x / (FRAME_WIDTH))
+  }
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       {selectedVideo ? ( // 선택된 비디오가 있다면
@@ -131,10 +166,10 @@ const handleScroll = (data) => {
             <Video
               style={styles.video}
               resizeMode={'cover'}
-              source={{uri: selectedVideo.uri}}
+              source={{ uri: selectedVideo.uri }}
               repeat={true}
               onLoad={handleVideoLoad}
-              onProgress = {handleProgress}
+              onProgress={handleProgress}
               paused={true}
               currentTime={currentTime}
               onSeek={onSeeking}
@@ -142,29 +177,67 @@ const handleScroll = (data) => {
           </View>
           {frames && (
             <View style={styles.durationWindowAndFramesLineContainer}>
-              <View style={styles.durationWindow}>
-                <View style={styles.durationLabelContainer}>
-                  <Text style={styles.durationLabel}>
-                    {DURATION_WINDOW_DURATION} sec.
+              <View style={{ flexDirection: 'row', overflow: 'hidden' }}>
+                <View style={{ zIndex: 10, backgroundColor: 'yellow', width: 50 }}>
+                  <Text style={{justifyContent: 'center', }}>
+                    {parseInt(((x/FRAME_WIDTH)%3600)/60)+ '.' + parseInt((x/FRAME_WIDTH)%60) + '.' + parseInt(x%100)}
                   </Text>
                 </View>
+                <View style={{left: -x, flexDirection: 'row'}}>
+                  <View style={{ width: FRAME_WIDTH * 2 , backgroundColor: 'red'}}></View>
+                  <View style={{ width: FRAME_WIDTH * frames.length, flexDirection: 'row'}}>
+                    {frames.map((frame, index) => renderFrameSecond(frame, index))}
+                  </View>
+                  <View style={{ width: FRAME_WIDTH * 2 , backgroundColor: 'red'}}></View>
+                </View>
               </View>
-              <View style={styles.popLineContainer}>
-                <View style={styles.popLine} />
-              </View>
-              <View style={styles.durationWindowLeftBorder} />
-              <View style={styles.durationWindowRightBorder} />
               <ScrollView
-                onScroll={handleScroll}
-                showsHorizontalScrollIndicator={false}
-                horizontal={true}
-                style={styles.framesLine}
-                alwaysBounceHorizontal={true}
-                scrollEventThrottle={1}>
-                <View style={styles.prependFrame} />
-                {frames.map((frame, index) => renderFrame(frame, index))}
-                <View style={styles.appendFrame} />
+                vertical
+                bounces={true}
+                style={{ width: DURATION_WINDOW_WIDTH * 2}}
+              >
+                <View style={{ flexDirection: 'row' }}>
+                  <View style={{ width: 50 }}>
+                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5 }}>
+                      <Text>Audio</Text>
+                    </View>
+                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5 }}>
+                      <Text>video</Text>
+                    </View>
+                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5 }}>
+                      <Text>video</Text>
+                    </View>
+                  </View>
+                  <View style={styles.popLineContainer}>
+                    <View style={styles.popLine} />
+                  </View>
+                  <View>
+                    <View style={{ marginBottom: 5 }}>
+                      <ScrollView
+                        onScroll={handleScroll}
+                        showsHorizontalScrollIndicator={false}
+                        horizontal={true}
+                        bounces={false}
+                        style={styles.framesLine}
+                        scrollEventThrottle={1}>
+                        <View style={{ width: FRAME_WIDTH * 2 }}></View>
+                        <View>
+                          <View style={{ flexDirection: 'row', borderRadius: 10 , marginBottom: 5}}>
+                            {frames.map((frame, index) => renderFrame(frame, index))}
+                          </View>
+                          <View style={{ flexDirection: 'row', borderRadius: 10 , marginBottom: 5}}>
+                            {frames.map((frame, index) => renderFrame(frame, index))}
+                          </View>
+                        </View>
+                        <View style={{ width: FRAME_WIDTH * 8 - 10}}></View>
+                      </ScrollView>
+                    </View>
+                  </View>
+                </View>
               </ScrollView>
+              <View>
+                <Text>asdasdsa</Text>
+              </View>
             </View>
           )}
         </>
@@ -196,7 +269,7 @@ const styles = StyleSheet.create({
   },
   videoContainer: {
     width: SCREEN_WIDTH,
-    height: 0.6 * SCREEN_HEIGHT,
+    height: 0.5 * SCREEN_HEIGHT,
     backgroundColor: 'rgba(255,255,255,0.1)',
     zIndex: 0,
   },
@@ -205,10 +278,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   durationWindowAndFramesLineContainer: {
-    top: -DURATION_WINDOW_BORDER_WIDTH,
-    width: SCREEN_WIDTH,
-    height: TILE_HEIGHT + DURATION_WINDOW_BORDER_WIDTH * 2,
-    justifyContent: 'center',
+    width: SCREEN_WIDTH ,
     zIndex: 10,
   },
   durationWindow: {
@@ -236,10 +306,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignSelf: POPLINE_POSITION === '50%' && 'center',
     zIndex: 25,
+    left: FRAME_WIDTH * 3 + 10
   },
   popLine: {
     width: 3,
-    height: TILE_HEIGHT,
+    height: SCREEN_HEIGHT * 2,
     backgroundColor: 'yellow',
   },
   durationWindowLeftBorder: {
@@ -265,7 +336,6 @@ const styles = StyleSheet.create({
   },
   framesLine: {
     width: SCREEN_WIDTH,
-    position: 'absolute',
   },
   loadingFrame: {
     width: TILE_WIDTH,

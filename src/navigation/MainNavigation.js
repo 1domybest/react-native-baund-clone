@@ -14,7 +14,7 @@ const Tab = createBottomTabNavigator();
 
 const MainNavigation = () => {
   return (
-    <Tab.Navigator initialRouteName={ROUTES.HOME} 
+    <Tab.Navigator initialRouteName={ROUTES.HOME}
     screenOptions={({route}) => ({
       headerShown: false,
       tabBarShowLabel: false,
@@ -82,7 +82,7 @@ const MainNavigation = () => {
     })}>
       <Tab.Screen name={ROUTES.HOME} component={HomeScreen} ></Tab.Screen>
       <Tab.Screen name={ROUTES.COMMUNITY} component={CommuntiyScreen} ></Tab.Screen>
-      <Tab.Screen name={ROUTES.CAMERA} component={CameraScreen} ></Tab.Screen>
+      <Tab.Screen name={ROUTES.CAMERA} component={CameraScreen} options={{tabBarStyle: {display: 'none'}}}></Tab.Screen>
       <Tab.Screen name={ROUTES.ACTIVITY} component={ActivityScreen} ></Tab.Screen>
       <Tab.Screen name={ROUTES.PROFILE} component={ProfileScreen} ></Tab.Screen>
     </Tab.Navigator>
