@@ -9,11 +9,12 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-
+import Ionicons from "react-native-vector-icons/Ionicons";
 import ImagePicker from 'react-native-image-crop-picker';
 import { Button } from 'react-native-paper';
 import Video from 'react-native-video';
 import FFmpegWrapper from '../../constants/FFmpegWrapper';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width; // 화면 width 사이즈
 const SCREEN_HEIGHT = Dimensions.get('screen').height; // 화면 height 사이즈
@@ -44,6 +45,8 @@ const Camera = () => {
   const [selectedVideo, setSelectedVideo] = useState(); // {uri: <string>, localFileName: <string>, creationDate: <Date>}
   const [frames, setFrames] = useState(); // <[{status: <FRAME_STATUS>, uri: <string>}]>
   const [audio, setAudio] = useState(); // <[{status: <FRAME_STATUS>, uri: <string>}]>
+  const [x, setX] = useState(null);
+  const [currentTime, setCurrentTime] = useState(0);
 
   const handlePressSelectVideoButton = () => {
     ImagePicker.openPicker({
@@ -135,26 +138,13 @@ const Camera = () => {
       text = index + "s"
     }
     return (
-      <Text style={{width: FRAME_WIDTH }}>{text}</Text>
+      <Text style={{width: FRAME_WIDTH, color: 'white', fontSize: 10 }} index={index}>{text}</Text>
     )
   }
-  const [currentTime, setCurrentTime] = useState(0);
-  handleProgress = (progress) => {
-    // console.log(progress.currentTime)
-  }
-  const onSeeking = (data) => {
-
-  };
-
-  const [ThumbNailScrollView, setThumbNailScrollView] = useState(null);
-
-  const [x, setX] = useState(null);
-
+  
   const handleScroll = (data) => {
     //console.log(ThumbNailScrollView)
     setX(data.nativeEvent.contentOffset.x)
-    var second = x/FRAME_WIDTH;
-
     setCurrentTime(data.nativeEvent.contentOffset.x / (FRAME_WIDTH))
   }
 
@@ -169,26 +159,24 @@ const Camera = () => {
               source={{ uri: selectedVideo.uri }}
               repeat={true}
               onLoad={handleVideoLoad}
-              onProgress={handleProgress}
               paused={true}
               currentTime={currentTime}
-              onSeek={onSeeking}
             />
           </View>
           {frames && (
             <View style={styles.durationWindowAndFramesLineContainer}>
               <View style={{ flexDirection: 'row', overflow: 'hidden' }}>
-                <View style={{ zIndex: 10, backgroundColor: 'yellow', width: 50 }}>
-                  <Text style={{justifyContent: 'center', }}>
+                <View style={{ zIndex: 10, backgroundColor: '#676666', width: FRAME_WIDTH + 10 }}>
+                  <Text style={{justifyContent: 'center', fontSize: 10, alignSelf: 'center', color: 'white' }}>
                     {parseInt(((x/FRAME_WIDTH)%3600)/60)+ '.' + parseInt((x/FRAME_WIDTH)%60) + '.' + parseInt(x%100)}
                   </Text>
                 </View>
                 <View style={{left: -x, flexDirection: 'row'}}>
-                  <View style={{ width: FRAME_WIDTH * 2 , backgroundColor: 'red'}}></View>
+                  <View style={{ width: FRAME_WIDTH * 2 , backgroundColor: '#60000096'}}></View>
                   <View style={{ width: FRAME_WIDTH * frames.length, flexDirection: 'row'}}>
                     {frames.map((frame, index) => renderFrameSecond(frame, index))}
                   </View>
-                  <View style={{ width: FRAME_WIDTH * 2 , backgroundColor: 'red'}}></View>
+                  <View style={{ width: FRAME_WIDTH * 2 , backgroundColor: '#60000096'}}></View>
                 </View>
               </View>
               <ScrollView
@@ -197,12 +185,16 @@ const Camera = () => {
                 style={{ width: DURATION_WINDOW_WIDTH * 2}}
               >
                 <View style={{ flexDirection: 'row' }}>
-                  <View style={{ width: 50 }}>
-                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5 }}>
-                      <Text>Audio</Text>
+                  <View style={{ width: FRAME_WIDTH + 10 }}>
+                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5, backgroundColor: '#676666'}}>
+                      <TouchableOpacity style={{}}>
+                        <Ionicons name={"musical-notes"} color="white" size={25}/>
+                      </TouchableOpacity>
                     </View>
-                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5 }}>
-                      <Text>video</Text>
+                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5, backgroundColor: '#676666' }}>
+                    <TouchableOpacity style={{}}>
+                        <Ionicons name={"scan-sharp"} color="white" size={25}/>
+                      </TouchableOpacity>
                     </View>
                     <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5 }}>
                       <Text>video</Text>
@@ -257,15 +249,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'black'
   },
   buttonContainer: {
-    backgroundColor: '#000',
+    backgroundColor: 'white',
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 16,
   },
   buttonText: {
-    color: '#fff',
+    color: 'blacks',
   },
   videoContainer: {
     width: SCREEN_WIDTH,
@@ -280,27 +273,7 @@ const styles = StyleSheet.create({
   durationWindowAndFramesLineContainer: {
     width: SCREEN_WIDTH ,
     zIndex: 10,
-  },
-  durationWindow: {
-    width: DURATION_WINDOW_WIDTH,
-    borderColor: 'yellow',
-    borderWidth: DURATION_WINDOW_BORDER_WIDTH,
-    borderRadius: 4,
-    height: TILE_HEIGHT + DURATION_WINDOW_BORDER_WIDTH * 2,
-    alignSelf: 'center',
-  },
-  durationLabelContainer: {
-    backgroundColor: 'yellow',
-    alignSelf: 'center',
-    top: -26,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderTopLeftRadius: 4,
-    borderTopRightRadius: 4,
-  },
-  durationLabel: {
-    color: 'rgba(0,0,0,0.6)',
-    fontWeight: '700',
+    backgroundColor: 'black'
   },
   popLineContainer: {
     position: 'absolute',
@@ -313,27 +286,6 @@ const styles = StyleSheet.create({
     height: SCREEN_HEIGHT * 2,
     backgroundColor: 'yellow',
   },
-  durationWindowLeftBorder: {
-    position: 'absolute',
-    width: DURATION_WINDOW_BORDER_WIDTH,
-    alignSelf: 'center',
-    height: TILE_HEIGHT + DURATION_WINDOW_BORDER_WIDTH * 2,
-    left: SCREEN_WIDTH / 2 - DURATION_WINDOW_WIDTH / 2,
-    borderTopLeftRadius: 8,
-    borderBottomLeftRadius: 8,
-    backgroundColor: 'yellow',
-    zIndex: 25,
-  },
-  durationWindowRightBorder: {
-    position: 'absolute',
-    width: DURATION_WINDOW_BORDER_WIDTH,
-    right: SCREEN_WIDTH - SCREEN_WIDTH / 2 - DURATION_WINDOW_WIDTH / 2,
-    height: TILE_HEIGHT + DURATION_WINDOW_BORDER_WIDTH * 2,
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
-    backgroundColor: 'yellow',
-    zIndex: 25,
-  },
   framesLine: {
     width: SCREEN_WIDTH,
   },
@@ -343,12 +295,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.05)',
     borderColor: 'rgba(0,0,0,0.1)',
     borderWidth: 1,
-  },
-  prependFrame: {
-    width: SCREEN_WIDTH / 2 - DURATION_WINDOW_WIDTH / 2,
-  },
-  appendFrame: {
-    width: SCREEN_WIDTH / 2 - DURATION_WINDOW_WIDTH / 2,
   },
 });
 
