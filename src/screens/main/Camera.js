@@ -134,14 +134,14 @@ const Camera = () => {
 
   const renderFrameSecond = (frame, index) => {
     var text = "•"
-    if (index%5 === 0) {
+    if (index % 5 === 0) {
       text = index + "s"
     }
     return (
-      <Text style={{width: FRAME_WIDTH, color: 'white', fontSize: 10 }} index={index}>{text}</Text>
+      <Text style={{ width: FRAME_WIDTH, color: 'white', fontSize: 10 }} index={index}>{text}</Text>
     )
   }
-  
+
   const handleScroll = (data) => {
     //console.log(ThumbNailScrollView)
     setX(data.nativeEvent.contentOffset.x)
@@ -162,42 +162,50 @@ const Camera = () => {
               paused={true}
               currentTime={currentTime}
             />
+            
           </View>
           {frames && (
             <View style={styles.durationWindowAndFramesLineContainer}>
-              <View style={{ flexDirection: 'row', overflow: 'hidden' }}>
+              <View style={{ flexDirection: 'row', overflow: 'hidden', paddingVertical: 10 }}>
                 <View style={{ zIndex: 10, backgroundColor: '#676666', width: FRAME_WIDTH + 10 }}>
-                  <Text style={{justifyContent: 'center', fontSize: 10, alignSelf: 'center', color: 'white' }}>
-                    {parseInt(((x/FRAME_WIDTH)%3600)/60)+ '.' + parseInt((x/FRAME_WIDTH)%60) + '.' + parseInt(x%100)}
+                  <Text style={{ justifyContent: 'center', fontSize: 10, alignSelf: 'center', color: 'white' }}>
+                    {parseInt(((x / FRAME_WIDTH) % 3600) / 60) + '.' + parseInt((x / FRAME_WIDTH) % 60) + '.' + parseInt(x % 100)}
                   </Text>
                 </View>
-                <View style={{left: -x, flexDirection: 'row'}}>
-                  <View style={{ width: FRAME_WIDTH * 2 , backgroundColor: '#60000096'}}></View>
-                  <View style={{ width: FRAME_WIDTH * frames.length, flexDirection: 'row'}}>
+                <View style={{ left: -x, flexDirection: 'row' }}>
+                  <View style={{ width: FRAME_WIDTH * 2, backgroundColor: '#60000096' }}></View>
+                  <View style={{ width: FRAME_WIDTH * frames.length, flexDirection: 'row' }}>
                     {frames.map((frame, index) => renderFrameSecond(frame, index))}
                   </View>
-                  <View style={{ width: FRAME_WIDTH * 2 , backgroundColor: '#60000096'}}></View>
+                  <View style={{ width: SCREEN_WIDTH, backgroundColor: '#60000096' }}></View>
                 </View>
               </View>
               <ScrollView
                 vertical
                 bounces={true}
-                style={{ width: DURATION_WINDOW_WIDTH * 2}}
+                style={{ width: DURATION_WINDOW_WIDTH * 2, overflow: 'hidden', height: SCREEN_HEIGHT * 0.2}}
               >
                 <View style={{ flexDirection: 'row' }}>
-                  <View style={{ width: FRAME_WIDTH + 10 }}>
-                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5, backgroundColor: '#676666'}}>
+                  <View style={{ width: FRAME_WIDTH + 10}}>
+                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5, backgroundColor: '#676666' }}>
                       <TouchableOpacity style={{}}>
-                        <Ionicons name={"musical-notes"} color="white" size={25}/>
+                        <Ionicons name={"musical-notes"} color="white" size={25} />
                       </TouchableOpacity>
                     </View>
                     <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5, backgroundColor: '#676666' }}>
-                    <TouchableOpacity style={{}}>
-                        <Ionicons name={"scan-sharp"} color="white" size={25}/>
+                      <TouchableOpacity style={{}}>
+                        <Ionicons name={"scan-sharp"} color="white" size={25} />
                       </TouchableOpacity>
                     </View>
-                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5 }}>
-                      <Text>video</Text>
+                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5, backgroundColor: '#676666' }}>
+                      <TouchableOpacity style={{}}>
+                        <Ionicons name={"mic"} color="white" size={25} />
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{ height: FRAME_WIDTH, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 5, backgroundColor: '#676666' }}>
+                      <TouchableOpacity style={{}}>
+                        <Ionicons name={"md-add"} color="white" size={25} />
+                      </TouchableOpacity>
                     </View>
                   </View>
                   <View style={styles.popLineContainer}>
@@ -209,27 +217,97 @@ const Camera = () => {
                         onScroll={handleScroll}
                         showsHorizontalScrollIndicator={false}
                         horizontal={true}
-                        bounces={false}
+                        bounces={true}
                         style={styles.framesLine}
                         scrollEventThrottle={1}>
                         <View style={{ width: FRAME_WIDTH * 2 }}></View>
                         <View>
-                          <View style={{ flexDirection: 'row', borderRadius: 10 , marginBottom: 5}}>
+                          <View style={{ flexDirection: 'row', borderRadius: 10, marginBottom: 5 }}>
                             {frames.map((frame, index) => renderFrame(frame, index))}
                           </View>
-                          <View style={{ flexDirection: 'row', borderRadius: 10 , marginBottom: 5}}>
+                          <View style={{ flexDirection: 'row', borderRadius: 10, marginBottom: 5 }}>
                             {frames.map((frame, index) => renderFrame(frame, index))}
                           </View>
                         </View>
-                        <View style={{ width: FRAME_WIDTH * 8 - 10}}></View>
+                        <View style={{ width: FRAME_WIDTH * 8 - 10 }}></View>
                       </ScrollView>
                     </View>
                   </View>
                 </View>
               </ScrollView>
-              <View>
-                <Text>asdasdsa</Text>
+              <View style={{
+                width: SCREEN_WIDTH,
+                shadowColor: "black",
+                shadowOffset: {
+                  width: 0,
+                  height: -10,
+                },
+                shadowOpacity: 0.9,
+              }}>
+                <View style={{ width: SCREEN_WIDTH, flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 25,alignItems: 'center' }}>
+                  <View>
+                    <TouchableOpacity style={{}}>
+                      <Ionicons name={"ios-options-sharp"} color="white" size={25} />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: SCREEN_WIDTH * 0.45,alignItems: 'center' }}>
+                    <View>
+                      <TouchableOpacity style={{}}>
+                        <Ionicons name={"play-skip-back"} color="white" size={25} />
+                      </TouchableOpacity>
+                    </View>
+                    <View>
+                      <TouchableOpacity style={{}}>
+                        <Ionicons name={"radio-button-on"} color="red" size={55} />
+                      </TouchableOpacity>
+                    </View>
+                    <View>
+                      <TouchableOpacity>
+                        <Ionicons name={"play-sharp"} color="white" size={25} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View>
+                    <TouchableOpacity style={{}}>
+                      <View style={{ backgroundColor: 'white', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 10 }}>
+                        <Text style={{ fontWeight: 'bold' }}>다음 ></Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
+              <View style={{width: SCREEN_WIDTH, paddingHorizontal: 15}}>
+                <ScrollView
+                  horizontal
+                >
+                  <View style={{flexDirection: 'row'}}>
+                    <TouchableOpacity style={{backgroundColor: '#676666', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, marginRight: 5}}>
+                      <Ionicons name={"md-pulse-sharp"} color="white" size={20} style={{marginBottom: 3,alignSelf: 'center'}}/>
+                      <Text style={{color: 'white', fontSize: 10}}>이팩트</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{backgroundColor: '#676666', paddingHorizontal: 10, paddingVertical: 8, borderRadius: 8, marginRight: 5}}>
+                      <Ionicons name={"md-pause-outline"} color="white" size={20} style={{marginBottom: 3,alignSelf: 'center'}}/>
+                      <Text style={{color: 'white', fontSize: 10}}>브레이크</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{backgroundColor: '#676666', paddingHorizontal: 10, paddingVertical: 8, borderRadius: 8, marginRight: 5}}>
+                      <Ionicons name={"speedometer-outline"} color="white" size={20} style={{marginBottom: 3,alignSelf: 'center'}}/>
+                      <Text style={{color: 'white', fontSize: 10}}>싱크 조정</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{backgroundColor: '#676666', paddingHorizontal: 10, paddingVertical: 8, borderRadius: 8, marginRight: 5}}>
+                      <Ionicons name={"md-copy-outline"} color="white" size={20} style={{marginBottom: 3,alignSelf: 'center'}}/>
+                      <Text style={{color: 'white', fontSize: 10}}>트랙 복제</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{backgroundColor: '#676666', paddingHorizontal: 10, paddingVertical: 8, borderRadius: 8, marginRight: 5}}>
+                      <Ionicons name={"trash-outline"} color="white" size={20} style={{marginBottom: 3,alignSelf: 'center'}}/>
+                      <Text style={{color: 'white', fontSize: 10}}>트랙 삭제</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{backgroundColor: '#676666', paddingHorizontal: 16, paddingVertical: 9, borderRadius: 8, marginRight: 5}}>
+                      <Ionicons name={"reload"} color="white" size={20} style={{marginBottom: 3,alignSelf: 'center'}}/>
+                      <Text style={{color: 'white', fontSize: 10}}>초기화</Text>
+                    </TouchableOpacity>
+                  </View>
+                </ScrollView>
+                </View>
             </View>
           )}
         </>
@@ -271,7 +349,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   durationWindowAndFramesLineContainer: {
-    width: SCREEN_WIDTH ,
+    width: SCREEN_WIDTH,
     zIndex: 10,
     backgroundColor: 'black'
   },
