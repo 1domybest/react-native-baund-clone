@@ -69,29 +69,28 @@ const Camera = () => {
       }),
     );
 
-    await FFmpegWrapper.getFrames( // 업로드된 영사을 FFmpeg Command 를 통하여 원하는 초마다 프레임을자르고 반환
-      selectedVideo.localFileName, // 업로드된 영상의 이름
-      selectedVideo.uri, // 업로드된 영상의 uri
-      numberOfFrames, // 프레임의 갯수
-      filePath => { // successCallback
-        const _framesURI = []; // 각 프레임을 담을 배열
-        for (let i = 0; i < numberOfFrames; i++) {
-          _framesURI.push( // 각프레임을 하나하나 담는다. 
-            `${filePath.replace('%4d', String(i + 1).padStart(4, 0))}`, // FFmpegWrapper 에서 지정한 outputImagePath 의 이름중 %4d' -> padStart 를 통해 받은 인덱스 예) 0,1,2,3 -> 0001 ,0002,0003,0004 로 변경후 교체
-          );
-        }
-        const _frames = _framesURI.map(_frameURI => ({ // 받은 배열들을 다시 map으로 반복문을 돌려 프레임마다 uri 를 저장해주고 상태를 LOADING -> READY 으로 변경해준다.
-          uri: _frameURI,
-          status: FRAME_STATUS.READY.name.description,
-        }));
-        setFrames(_frames); // 변경된 값들을 useState 를통해 다시 저장
-      },
-    );
+    // await FFmpegWrapper.getFrames( // 업로드된 영사을 FFmpeg Command 를 통하여 원하는 초마다 프레임을자르고 반환
+    //   selectedVideo.localFileName, // 업로드된 영상의 이름
+    //   selectedVideo.uri, // 업로드된 영상의 uri
+    //   numberOfFrames, // 프레임의 갯수
+    //   filePath => { // successCallback
+    //     const _framesURI = []; // 각 프레임을 담을 배열
+    //     for (let i = 0; i < numberOfFrames; i++) {
+    //       _framesURI.push( // 각프레임을 하나하나 담는다. 
+    //         `${filePath.replace('%4d', String(i + 1).padStart(4, 0))}`, // FFmpegWrapper 에서 지정한 outputImagePath 의 이름중 %4d' -> padStart 를 통해 받은 인덱스 예) 0,1,2,3 -> 0001 ,0002,0003,0004 로 변경후 교체
+    //       );
+    //     }
+    //     const _frames = _framesURI.map(_frameURI => ({ // 받은 배열들을 다시 map으로 반복문을 돌려 프레임마다 uri 를 저장해주고 상태를 LOADING -> READY 으로 변경해준다.
+    //       uri: _frameURI,
+    //       status: FRAME_STATUS.READY.name.description,
+    //     }));
+    //     setFrames(_frames); // 변경된 값들을 useState 를통해 다시 저장
+    //   },
+    // );
     await FFmpegWrapper.getAudio( // 업로드된 영사을 FFmpeg Command 를 통하여 원하는 초마다 프레임을자르고 반환
       selectedVideo.localFileName, // 업로드된 영상의 이름
       selectedVideo.uri, // 업로드된 영상의 uri
       filePath => { // successCallback
-        console.log(filePath)
         setAudio(filePath); // 변경된 값들을 useState 를통해 다시 저장
       },
     );
@@ -138,7 +137,7 @@ const Camera = () => {
       text = index + "s"
     }
     return (
-      <Text style={{ width: FRAME_WIDTH, color: 'white', fontSize: 10 }} index={index}>{text}</Text>
+      <Text style={{ width: FRAME_WIDTH, color: 'white', fontSize: 10 }} key={index}>{text}</Text>
     )
   }
 
@@ -222,9 +221,9 @@ const Camera = () => {
                         scrollEventThrottle={1}>
                         <View style={{ width: FRAME_WIDTH * 2 }}></View>
                         <View>
-                          <View style={{ flexDirection: 'row', borderRadius: 10, marginBottom: 5 }}>
+                          {/* <View style={{ flexDirection: 'row', borderRadius: 10, marginBottom: 5 }}>
                             {frames.map((frame, index) => renderFrame(frame, index))}
-                          </View>
+                          </View> */}
                           <View style={{ flexDirection: 'row', borderRadius: 10, marginBottom: 5 }}>
                             {frames.map((frame, index) => renderFrame(frame, index))}
                           </View>

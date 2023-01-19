@@ -1,5 +1,5 @@
 // lib/FFmpeg.js
-import {FFmpegKit, FFmpegKitConfig, ReturnCode} from 'ffmpeg-kit-react-native';
+import {FFmpegKit, FFmpegKitConfig, ReturnCode, FFprobeKit, FFprobeSessionCompleteCallback, Log} from 'ffmpeg-kit-react-native';
 import RNFS from 'react-native-fs';
 
 import {
@@ -26,12 +26,32 @@ class FFmpegWrapper {
     successCallback,
     errorCallback,
   ) {
-    let outputPath = `${RNFS.CachesDirectoryPath}/${localFileName}.mp3`; // 업로드된 파일을 캐싱하여 각 초마다 저장했을때의 path 를 등록
-    const ffmpegCommand = `-ss 0 -i ${videoURI} -acodec copy -map 0:a:0 -vn -f rawvideo ${outputPath}`;
-    excute(ffmpegCommand, outputPath,successCallback, errorCallback);
+    let outputPath = `${RNFS.CachesDirectoryPath}/${localFileName}.txt`; // 업로드된 파일을 캐싱하여 각 초마다 저장했을때의 path 를 등록
+    // const ffmpegCommand = `-ss 0 -i ${videoURI} -acodec copy -map 0:a:0 -vn -f rawvideo ${outputPath}`;
+     const ffmpegCommand = `-v quiet -select_streams v -show_entries packet=size:stream=duration -of compact=p=0:nk=1 ${videoURI}` // 윈도우에서는 됨
+    //const ffmpegCommand = `-select_streams -show_entries stream=bit_rate - of default=noprint_wrappers= 1 ${videoURI}` // 윈도우에서는 됨
+    //const ffmpegCommand = `ffprobe -v quiet -print_format json -show_format -show_streams ${videoURI}` // 윈도우에서는 됨
+    audio(ffmpegCommand, videoURI)
   }
 }
 
+const audio = async (command, videoURI) => {
+  FFprobeKit.executeAsync(command, async session => {
+    console.log('======================')
+    const log = session.getOutput();
+    log.then(res => {
+      var list = res.split('\n')
+      list.forEach(function (res) {
+        console.log(res)
+      })
+    })
+  })
+}
+
+
+    // await session.getAllLogsAsString().then(res => {
+    //   console.log(res)
+    // })
 
 const excute = (ffmpegCommand, outputPath,successCallback, errorCallback) => {
   FFmpegKit.executeAsync( // FFmpegKit 라이브러리의 비동기 실행함수 시작
@@ -43,7 +63,6 @@ const excute = (ffmpegCommand, outputPath,successCallback, errorCallback) => {
     const returnCode = await session.getReturnCode(); // 세션의 response 확인
     const failStackTrace = await session.getFailStackTrace(); // 실패시 호출이 시작된시점부터 예외가 발생할때까지의 함수 목록반환 (디버깅용임)
     const duration = await session.getDuration(); // 걸린 시간 반환
-
     if (ReturnCode.isSuccess(returnCode)) { // 성공적으로 처리되었다면
       console.log(
         `Encode completed successfully in ${duration} milliseconds;.`, // 처리되었다는 log 반환
