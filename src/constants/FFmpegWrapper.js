@@ -16,7 +16,7 @@ class FFmpegWrapper {
     errorCallback,
   ) {
     let outputPath = `${RNFS.CachesDirectoryPath}/${localFileName}_%4d.png`; // 업로드된 파일을 캐싱하여 각 초마다 저장했을때의 path 를 등록
-    const ffmpegCommand = `-ss 0 -i ${videoURI} -vf "fps=${FRAME_PER_SEC}/1:round=up,scale=${FRAME_WIDTH}:-2" -vframes ${frameNumber} ${outputPath}`;
+    const ffmpegCommand = `-v quiet -ss 0 -i ${videoURI} -vf "fps=${FRAME_PER_SEC}/1:round=up,scale=${FRAME_WIDTH}:-2" -vframes ${frameNumber} ${outputPath}`;
     excute(ffmpegCommand, outputPath,successCallback, errorCallback);
   }
 
@@ -26,32 +26,22 @@ class FFmpegWrapper {
     successCallback,
     errorCallback,
   ) {
-    let outputPath = `${RNFS.CachesDirectoryPath}/${localFileName}.txt`; // 업로드된 파일을 캐싱하여 각 초마다 저장했을때의 path 를 등록
-    // const ffmpegCommand = `-ss 0 -i ${videoURI} -acodec copy -map 0:a:0 -vn -f rawvideo ${outputPath}`;
-     const ffmpegCommand = `-v quiet -select_streams v -show_entries packet=size:stream=duration -of compact=p=0:nk=1 ${videoURI}` // 윈도우에서는 됨
-    //const ffmpegCommand = `-select_streams -show_entries stream=bit_rate - of default=noprint_wrappers= 1 ${videoURI}` // 윈도우에서는 됨
-    //const ffmpegCommand = `ffprobe -v quiet -print_format json -show_format -show_streams ${videoURI}` // 윈도우에서는 됨
-    audio(ffmpegCommand, videoURI)
+    let outputPath = `${RNFS.CachesDirectoryPath}/${localFileName}_%4d.mp3`; // 업로드된 파일을 캐싱하여 각 초마다 저장했을때의 path 를 등록
+    const ffmpegCommand = `-v quiet -select_streams v -show_entries packet=size:stream=duration -of compact=p=0:nk=1 ${videoURI}` // 윈도우에서는 됨
+    audio(ffmpegCommand,successCallback, videoURI)
   }
 }
 
-const audio = async (command, videoURI) => {
+const audio = async (command,successCallback, videoURI) => {
   FFprobeKit.executeAsync(command, async session => {
-    console.log('======================')
     const log = session.getOutput();
     log.then(res => {
-      var list = res.split('\n')
-      list.forEach(function (res) {
-        console.log(res)
-      })
+      var bitRates = res.split('\n')
+      var heightestRate = Math.max.apply(Math, bitRates);
+      successCallback({bitRates: bitRates, heightestRate: heightestRate});
     })
   })
 }
-
-
-    // await session.getAllLogsAsString().then(res => {
-    //   console.log(res)
-    // })
 
 const excute = (ffmpegCommand, outputPath,successCallback, errorCallback) => {
   FFmpegKit.executeAsync( // FFmpegKit 라이브러리의 비동기 실행함수 시작

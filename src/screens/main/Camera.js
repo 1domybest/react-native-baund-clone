@@ -42,9 +42,12 @@ const FRAME_STATUS = Object.freeze({
 });
 
 const Camera = () => {
-  const [selectedVideo, setSelectedVideo] = useState(); // {uri: <string>, localFileName: <string>, creationDate: <Date>}
-  const [frames, setFrames] = useState(); // <[{status: <FRAME_STATUS>, uri: <string>}]>
-  const [audio, setAudio] = useState(); // <[{status: <FRAME_STATUS>, uri: <string>}]>
+  const [selectedVideo, setSelectedVideo] = useState(); 
+  const [frames, setFrames] = useState();
+  const [audioBitRates, setAudioBitRate] = useState([]); 
+  const [heightestRate, setHeightestRate] = useState(null); 
+  const [isPlaying, setisPlaying] = useState(false);
+  const [playingScroll, setPlayScroll] = useState(null); 
   const [x, setX] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
 
@@ -69,32 +72,44 @@ const Camera = () => {
       }),
     );
 
-    // await FFmpegWrapper.getFrames( // 업로드된 영사을 FFmpeg Command 를 통하여 원하는 초마다 프레임을자르고 반환
-    //   selectedVideo.localFileName, // 업로드된 영상의 이름
-    //   selectedVideo.uri, // 업로드된 영상의 uri
-    //   numberOfFrames, // 프레임의 갯수
-    //   filePath => { // successCallback
-    //     const _framesURI = []; // 각 프레임을 담을 배열
-    //     for (let i = 0; i < numberOfFrames; i++) {
-    //       _framesURI.push( // 각프레임을 하나하나 담는다. 
-    //         `${filePath.replace('%4d', String(i + 1).padStart(4, 0))}`, // FFmpegWrapper 에서 지정한 outputImagePath 의 이름중 %4d' -> padStart 를 통해 받은 인덱스 예) 0,1,2,3 -> 0001 ,0002,0003,0004 로 변경후 교체
-    //       );
-    //     }
-    //     const _frames = _framesURI.map(_frameURI => ({ // 받은 배열들을 다시 map으로 반복문을 돌려 프레임마다 uri 를 저장해주고 상태를 LOADING -> READY 으로 변경해준다.
-    //       uri: _frameURI,
-    //       status: FRAME_STATUS.READY.name.description,
-    //     }));
-    //     setFrames(_frames); // 변경된 값들을 useState 를통해 다시 저장
-    //   },
-    // );
+    await FFmpegWrapper.getFrames( // 업로드된 영사을 FFmpeg Command 를 통하여 원하는 초마다 프레임을자르고 반환
+      selectedVideo.localFileName, // 업로드된 영상의 이름
+      selectedVideo.uri, // 업로드된 영상의 uri
+      numberOfFrames, // 프레임의 갯수
+      filePath => { // successCallback
+        const _framesURI = []; // 각 프레임을 담을 배열
+        for (let i = 0; i < numberOfFrames; i++) {
+          _framesURI.push( // 각프레임을 하나하나 담는다. 
+            `${filePath.replace('%4d', String(i + 1).padStart(4, 0))}`, // FFmpegWrapper 에서 지정한 outputImagePath 의 이름중 %4d' -> padStart 를 통해 받은 인덱스 예) 0,1,2,3 -> 0001 ,0002,0003,0004 로 변경후 교체
+          );
+        }
+        const _frames = _framesURI.map(_frameURI => ({ // 받은 배열들을 다시 map으로 반복문을 돌려 프레임마다 uri 를 저장해주고 상태를 LOADING -> READY 으로 변경해준다.
+          uri: _frameURI,
+          status: FRAME_STATUS.READY.name.description,
+        }));
+        setFrames(_frames); // 변경된 값들을 useState 를통해 다시 저장
+      },
+    );
     await FFmpegWrapper.getAudio( // 업로드된 영사을 FFmpeg Command 를 통하여 원하는 초마다 프레임을자르고 반환
       selectedVideo.localFileName, // 업로드된 영상의 이름
       selectedVideo.uri, // 업로드된 영상의 uri
-      filePath => { // successCallback
-        setAudio(filePath); // 변경된 값들을 useState 를통해 다시 저장
+      res => { // successCallback
+        console.log(res)
+        var bitRates = res.bitRates
+        var heightestRate = res.heightestRate
+        setHeightestRate(heightestRate)
+        setAudioBitRate(bitRates)
+        // setAudio(filePath); // 변경된 값들을 useState 를통해 다시 저장
       },
     );
   };
+
+  const onProgress = (e) => {
+    if (isPlaying) {
+      setX(e.currentTime * FRAME_WIDTH)
+      playingScroll.scrollTo({x: e.currentTime * FRAME_WIDTH})
+    }
+  }
 
   const renderFrame = (frame, index) => {
     if (frame.status === FRAME_STATUS.LOADING.name.description) { // 받은 프레임의 상태가 LOADING 이라면
@@ -123,13 +138,21 @@ const Camera = () => {
             borderTopRightRadius: borderTopRightRadius,
             borderBottomRightRadius: borderBottomRightRadius,
           }}
-          onLoad={() => { // 다되면 이미지가 반환됬다고 알림
-            console.log('Image loaded');
-          }}
+          // onLoad={() => { // 다되면 이미지가 반환됬다고 알림
+          //   console.log('Image loaded');
+          // }}
         />
       );
     }
   };
+
+  const renderBitRateFrame = (bitRate, index) => {
+    return (
+      <View style={{flex: 1, justifyContent: 'center'}} key={index}>
+        <Text style={{width: 1.35, height: (bitRate/heightestRate) * FRAME_WIDTH, backgroundColor: 'white'}}></Text>
+      </View>
+    )
+  }
 
   const renderFrameSecond = (frame, index) => {
     var text = "•"
@@ -141,10 +164,11 @@ const Camera = () => {
     )
   }
 
-  const handleScroll = (data) => {
-    //console.log(ThumbNailScrollView)
-    setX(data.nativeEvent.contentOffset.x)
-    setCurrentTime(data.nativeEvent.contentOffset.x / (FRAME_WIDTH))
+  const handleScroll = (data) => {    
+    if (!isPlaying) {
+      setX(data.nativeEvent.contentOffset.x)
+      setCurrentTime(data.nativeEvent.contentOffset.x / (FRAME_WIDTH))
+    }
   }
 
   return (
@@ -156,12 +180,13 @@ const Camera = () => {
               style={styles.video}
               resizeMode={'cover'}
               source={{ uri: selectedVideo.uri }}
-              repeat={true}
+              repeat={false}
               onLoad={handleVideoLoad}
-              paused={true}
+              onEnd={(res) => setisPlaying(false)}
+              onProgress={onProgress}
+              paused={!isPlaying}
               currentTime={currentTime}
             />
-            
           </View>
           {frames && (
             <View style={styles.durationWindowAndFramesLineContainer}>
@@ -213,6 +238,7 @@ const Camera = () => {
                   <View>
                     <View style={{ marginBottom: 5 }}>
                       <ScrollView
+                        ref={ref => setPlayScroll(ref)}
                         onScroll={handleScroll}
                         showsHorizontalScrollIndicator={false}
                         horizontal={true}
@@ -221,9 +247,9 @@ const Camera = () => {
                         scrollEventThrottle={1}>
                         <View style={{ width: FRAME_WIDTH * 2 }}></View>
                         <View>
-                          {/* <View style={{ flexDirection: 'row', borderRadius: 10, marginBottom: 5 }}>
-                            {frames.map((frame, index) => renderFrame(frame, index))}
-                          </View> */}
+                          <View style={{ flexDirection: 'row', borderRadius: 10, marginBottom: 5, height: FRAME_WIDTH}}>
+                            {audioBitRates.map((frame, index) => renderBitRateFrame(frame, index))}
+                          </View>
                           <View style={{ flexDirection: 'row', borderRadius: 10, marginBottom: 5 }}>
                             {frames.map((frame, index) => renderFrame(frame, index))}
                           </View>
@@ -261,8 +287,8 @@ const Camera = () => {
                       </TouchableOpacity>
                     </View>
                     <View>
-                      <TouchableOpacity>
-                        <Ionicons name={"play-sharp"} color="white" size={25} />
+                      <TouchableOpacity onPress={() => setisPlaying(!isPlaying)}>
+                        <Ionicons name={isPlaying ? "pause" : 'play'} color="white" size={25} />
                       </TouchableOpacity>
                     </View>
                   </View>
